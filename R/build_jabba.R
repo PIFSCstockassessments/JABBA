@@ -438,7 +438,7 @@ build_jabba <- function(
   
   
   # PARAMETERS TO MONITOR
-  params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","Overfishing_ind","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","TOE")
+  params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","Overfishing_ind","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","prOverfishing_ind","TOE")
   
   
   #-----------------------------------------------

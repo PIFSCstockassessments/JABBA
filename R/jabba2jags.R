@@ -193,7 +193,7 @@ jabba2jags = function(jbinput, dir){
 
     for (t in 1:N)  # Overfishing status given state-dependent rule
     {
-    Overfishing_ind[t]<-ifelse(BtoBmsy[t]>0.866, H[t]/(Hmsy),  H[t]/((Hmsy*SB[t])/(0.0.866*SBmsy)))
+    Overfishing_ind[t]<-ifelse(BtoBmsy[t]>0.866, H[t]/(Hmsy),  H[t]/((Hmsy*SB[t])/(0.866*SBmsy)))
     }
 
 
