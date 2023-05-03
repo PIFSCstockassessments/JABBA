@@ -22,6 +22,9 @@ Inbuilt JABBA features include:
 `library(devtools)` <br>
 `install_github("jabbamodel/JABBA")`
 
+To install the PIFSC-dev branch use:
+`remotes::install_github("PIFSCstockassessments/JABBA", ref = "PIFSC-dev")`
+
 ## Test-drive JABBA
 
 `library(JABBA)`<br>
