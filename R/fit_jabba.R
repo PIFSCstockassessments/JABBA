@@ -185,17 +185,18 @@ fit_jabba = function(jbinput,
   
   # Current stock status (Kobe posterior)
   H_Hmsy.cur = posteriors$HtoHmsy[,c(n.years)]
+  Overfishing.cur = posteriors$Overfishing_ind[,c(n.years)]
   B_Bmsy.cur = posteriors$BtoBmsy[,c(n.years)]
   
   
   # Prepare posterior quantaties
-  man.dat = data.frame(man.dat,Depletion,B_Bmsy.cur,H_Hmsy.cur)
+  man.dat = data.frame(man.dat,Depletion,B_Bmsy.cur,H_Hmsy.cur, Overfishing.cur)
   
   results = t(cbind(apply(par.dat,2,quantile,c(0.025,0.5,0.975)))) 
   
   results = data.frame(Median = results[,2],LCI=results[,1],UCI=results[,3],Geweke.p=round(pvalues,3),Heidel.p = round(heidle[,3],3))
-  
-  ref.points = round(t(cbind(apply(man.dat,2,quantile,c(0.025,0.5,0.975)))),3)
+  #JS added Overfishing ref point below, need to check dims
+  ref.points = round(t(cbind(apply(man.dat[,1:4],2,quantile,c(0.025,0.5,0.975)),apply(man.dat[,5],2,sum)/dim(man.dat)[2]),3))
   
   ref.points = data.frame(Median = ref.points[,2],LCI=ref.points[,1],UCI=ref.points[,3])
   # get number of parameters
@@ -222,14 +223,15 @@ fit_jabba = function(jbinput,
   #Ht_Hmsy = posteriors$HtoHmsy
   #Bt_K = posteriors$P
   catch.temp = matrix(rep(catch[,2],each=nrow(posteriors$SB)),ncol=nrow(jbinput$data$catch),nrow=nrow(posteriors$SB))
-  
+  #JS added Overfishing ref point below, need to check dims
   yrdim = length(years)
-  Stock_trj = array(data=NA,dim=c(yrdim,3,7),dimnames = list(years,c("mu","lci","uci"),c("B","F","BBmsy","FFmsy","BB0","procB","SPt")))
+  Stock_trj = array(data=NA,dim=c(yrdim,3,7),dimnames = list(years,c("mu","lci","uci"),c("B","F","BBmsy","FFmsy","Overfishing","BB0","procB","SPt")))
   for(i in 1:3){
     Stock_trj[,i,] =  cbind(t(apply(posteriors$SB[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$H[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$BtoBmsy[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$HtoHmsy[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
+                            t(apply(posteriors$Overfishing_ind[,1:yrdim],2,sum)/dim(Overfishing_ind)[2]), #[,i],
                             t(apply(posteriors$P[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$Proc.Dev[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(cbind(rep(0,3),apply(posteriors$SB[,-1]-posteriors$SB[,-ncol(posteriors$SB)]+catch.temp[,-ncol(posteriors$SB)],2,quantile,c(0.5,0.025,0.975)))[,1:yrdim])[,i]
@@ -540,7 +542,7 @@ fit_jabba = function(jbinput,
       kb.temp$run = paste0("C",TACs[j])
       for(i in 1:pyrs){
         kb.temp = rbind(kb.temp,data.frame(year=proj.yrs[i],run=paste0("C",TACs[j]),type="prj",iter=1:length(posteriors$K),
-                                           stock=posteriors$prBtoBmsy[,i,j],harvest=posteriors$prHtoHmsy[,i,j],B=posteriors$prBtoBmsy[,i,j]*posteriors$SBmsy,H=posteriors$prHtoHmsy[,i,j]*posteriors$Hmsy,
+                                           stock=posteriors$prBtoBmsy[,i,j],harvest=posteriors$prHtoHmsy[,i,j],Overfishing=posteriors$prOverfishing_ind[,i,j],B=posteriors$prBtoBmsy[,i,j]*posteriors$SBmsy,H=posteriors$prHtoHmsy[,i,j]*posteriors$Hmsy,
                                            Bdev=0,Catch= TACs[j],BB0=posteriors$prP[,i,j]))
       }
       
