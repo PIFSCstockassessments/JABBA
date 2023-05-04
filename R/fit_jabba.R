@@ -224,15 +224,14 @@ fit_jabba = function(jbinput,
   #Ht_Hmsy = posteriors$HtoHmsy
   #Bt_K = posteriors$P
   catch.temp = matrix(rep(catch[,2],each=nrow(posteriors$SB)),ncol=nrow(jbinput$data$catch),nrow=nrow(posteriors$SB))
-  #JS added Overfishing ref point below, need to check dims
+  #JS added Overfishing ref point below
   yrdim = length(years)
-  Stock_trj = array(data=NA,dim=c(yrdim,3,8),dimnames = list(years,c("mu","lci","uci"),c("B","F","BBmsy","FFmsy","Overfishing_ind","BB0","procB","SPt")))
+  Stock_trj = array(data=NA,dim=c(yrdim,3,8),dimnames = list(years,c("mu","lci","uci"),c("B","F","BBmsy","FFmsy","Overfishing_ind","BB0","procB","SPt"))) 
   for(i in 1:3){
     Stock_trj[,i,] =  cbind(t(apply(posteriors$SB[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$H[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$BtoBmsy[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$HtoHmsy[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
-                            #t(apply(posteriors$Overfishing_ind[,1:yrdim],1,sum)/dim(posteriors$Overfishing_ind)[1])[,1],
                             t(apply(posteriors$Overfishing_ind[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$P[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$Proc.Dev[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
@@ -241,7 +240,14 @@ fit_jabba = function(jbinput,
     
   }
   
+  #JS - added pOFLH and pOFLB
   
+  OFLH<-ifelse(posteriors$Overfishing_ind>1,1,0)
+  pOFLH<-t(apply(OFLH[,1:yrdim],2,sum)/apply(OFLH[,1:yrdim],2,length))[,1:yrdim]
+  OFLB<-ifelse(posteriors$BtoBmsy<0.866,1,0)
+  pOFLB<-t(apply(OFLB[,1:yrdim],2,sum)/apply(OFLB[,1:yrdim],2,length))[,1:yrdim]
+
+  Stock_trj2<-cbind(Stock_trj[,1,],pOFLH,pOFLB)
   
   #------------------------
   # Production function
@@ -570,6 +576,8 @@ fit_jabba = function(jbinput,
     write.csv(data.frame(results),paste0(output.dir,"/Estimates_",settings$assessment,"_",settings$scenario,".csv"))
     write.csv(Table,paste0(output.dir,"/Results_",settings$assessment,"_",settings$scenario,".csv"))
     write.csv(jabba$stats,paste0(output.dir,"/GoodnessFit_",settings$assessment,"_",settings$scenario,".csv"))
+    write.csv( Stock_trj2,paste0(output.dir,"/Stock_trj2_",settings$assessment,"_",settings$scenario,".csv"))
+
   }
   
   

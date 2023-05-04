@@ -84,7 +84,7 @@ jbinput = build_jabba(catch=d7_catch,
 jbplot_indices(jbinput,legend.loc = "topleft")
 
 #fit                      
-fit_test = fit_jabba(jbinput,ni=1000,nt=10,nb=200,nc=3,verbose=TRUE,save.csvs = TRUE,do.ppc=TRUE,save.all = TRUE) #,output.dir=file.path(main_dir,"Results",scenario)) 
+fit_test = fit_jabba(jbinput,ni=100000,nt=10,nb=20000,nc=3,verbose=TRUE,save.csvs = TRUE,do.ppc=TRUE,save.all = TRUE) #,output.dir=file.path(main_dir,"Results",scenario)) 
 
 #save.jabba==TRUE #I believe this saves the posteriors
 
@@ -92,3 +92,4 @@ summary(fit_test)
 fit_test$pars
 fit_test$estimates
 fit_test$stats
+fit_test$posteriors
