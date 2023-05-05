@@ -16,13 +16,14 @@ Description: Bayesian State-Space Surplus Production Model to Catch and Abundanc
 Depends:
     R (>= 3.5)
 Imports:
-      gplots,
-      coda,
-      rjags,
-      R2jags,
-      randtests,
-      reshape,
-      scales
+    gplots,
+    coda,
+    rjags,
+    R2jags,
+    randtests,
+    reshape,
+    scales,
+    reshape2
 Suggests:
     mvtnorm,
     testthat (>= 3.0.0)
