@@ -11,47 +11,20 @@ on:
 
 name: R-CMD-check
 jobs:
-  matrix_prep:
-  # Determine the build matrix (OS and versions of R)
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        repository: 'nmfs-fish-tools/ghactions4r'
-        ref: 'main'
-    - name: check path
-      run: |
-        ls -r
-        pwd
-    - id: set-matrix
-      run: |
-        if ${{ inputs.use_full_build_matrix }} == 'true';
-        then
-          JSON=$(cat ./github/matrix_includes_full.json)
-        else
-          JSON=$(cat ./github/matrix_includes_standard.json)
-        fi
-        # note: if users were inputting the $JSON info, would want to 
-        # randomize the delimiter. See 
-        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
-        echo 'matrix<<EOF' >> $GITHUB_OUTPUT
-        echo "$JSON">> $GITHUB_OUTPUT
-        echo 'EOF' >> $GITHUB_OUTPUT
-  R-CMD-check:
-    needs: matrix_prep
-    runs-on: ${{matrix.config.os }}
-    timeout-minutes: ${{ inputs.gha_timeout_minutes }}
+   R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
     strategy:
       fail-fast: false
       matrix:
-        config: ${{ fromJson(needs.matrix_prep.outputs.matrix) }}
+        config:
+          - {os: macos-latest,   r: 'release'}
+          - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
+   
     env:
-      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
