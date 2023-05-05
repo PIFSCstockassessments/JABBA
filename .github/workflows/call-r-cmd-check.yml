@@ -42,11 +42,6 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - uses: r-lib/actions/check-r-package@v2
-        with:
-          upload-snapshots: true
-          error-on: '"error"'
-
       - name: Install JAGS on Windows
         if: runner.os == 'Windows'
         run: C:\JAGS-4.3.0.exe /S
@@ -61,6 +56,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install libglpk-dev libglpk40 jags libv8-dev libnode-dev libcurl4-openssl-dev
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          error-on: '"error"'
 
       - name: Show testthat output
         if: always()
