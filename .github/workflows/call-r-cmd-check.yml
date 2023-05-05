@@ -1,13 +1,92 @@
-# Run r cmd check
-name: call-r-cmd-check
-# on specifies the build triggers. See more info at https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
+# Reusable workflow for R-CMD-check
+# based on https://github.com/r-lib/actions/blob/v2/examples/check-full.yaml
+
 on:
-# The default build trigger is to run the action on every push and pull request, for any branch
   push:
   pull_request:
-  # To run the default repository branch weekly on sunday, uncomment the following 2 lines
-  #schedule:
-    #- cron: '0 0 * * 0'
+    branches:
+      - main
+      - master
+      - PIFSC-dev
+
+name: R-CMD-check
 jobs:
-  call-workflow:
-    uses: nmfs-fish-tools/ghactions4r/.github/workflows/r-cmd-check.yml@main
+  matrix_prep:
+  # Determine the build matrix (OS and versions of R)
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: 'nmfs-fish-tools/ghactions4r'
+        ref: 'main'
+    - name: check path
+      run: |
+        ls -r
+        pwd
+    - id: set-matrix
+      run: |
+        if ${{ inputs.use_full_build_matrix }} == 'true';
+        then
+          JSON=$(cat ./github/matrix_includes_full.json)
+        else
+          JSON=$(cat ./github/matrix_includes_standard.json)
+        fi
+        # note: if users were inputting the $JSON info, would want to 
+        # randomize the delimiter. See 
+        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
+        echo 'matrix<<EOF' >> $GITHUB_OUTPUT
+        echo "$JSON">> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
+  R-CMD-check:
+    needs: matrix_prep
+    runs-on: ${{matrix.config.os }}
+    timeout-minutes: ${{ inputs.gha_timeout_minutes }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config: ${{ fromJson(needs.matrix_prep.outputs.matrix) }}
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          error-on: '"error"'
+
+      - name: Install JAGS
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jags
+
+      - name: Show testthat output
+        if: always()
+        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
+
+      - name: Upload check results
+        if: failure()
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+          path: check
