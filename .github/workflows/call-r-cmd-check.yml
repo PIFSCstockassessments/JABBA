@@ -1,6 +1,8 @@
 # Reusable workflow for R-CMD-check
 # based on https://github.com/r-lib/actions/blob/v2/examples/check-full.yaml
 
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on: [push, pull_request]
 
 name: check
@@ -15,12 +17,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
+          - {os: windows-latest, r: '4.2.2', rtools: '42'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      JAGS_HOME: 'C:\JAGS-4.3.0.exe'
       NOT_CRAN: true
-      JAGS_HOME: 'C:\JAGS-4.3.1.exe'
       R_KEEP_PKG_SOURCE: yes
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: false
 
@@ -36,11 +38,21 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Install Linux system dependencies
-        if: runner.os == 'Linux'
+      - name: Install most Windows system dependencies
+        if: runner.os == 'Windows'
         run: |
-          sudo apt-get update
-          sudo apt-get install libglpk-dev libglpk40 jags libv8-dev libnode-dev libcurl4-openssl-dev
+          pacman -Syu mingw-w64-x86_64-make --noconfirm
+          g++ --version
+          Get-Command g++ | Select-Object -ExpandProperty Definition
+          mingw32-make --version
+          Get-Command mingw32-make | Select-Object -ExpandProperty Definition
+          (New-Object System.Net.WebClient).DownloadFile('https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/JAGS-4.3.0.exe', 'C:\JAGS-4.3.0.exe')
+        shell: powershell
+
+      - name: Install JAGS on Windows
+        if: runner.os == 'Windows'
+        run: C:\JAGS-4.3.0.exe /S
+        shell: cmd
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
