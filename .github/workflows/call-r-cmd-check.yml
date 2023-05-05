@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: windows-latest, r: 'release', rtools: '42'}
+          - {os: windows-latest, r: 'release', rtools: '43'}
    
 
     env:
