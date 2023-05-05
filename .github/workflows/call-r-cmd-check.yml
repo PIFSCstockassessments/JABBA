@@ -2,10 +2,11 @@
 # based on https://github.com/r-lib/actions/blob/v2/examples/check-full.yaml
 
 on: [push, pull_request]
- 
-name: R-CMD-check
+
+name: check
+
 jobs:
-   R-CMD-check:
+  check:
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
@@ -14,10 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release', rtools: ''}
-          - {os: windows-latest, r: 'release',  rtools: ''}
-          - {os: ubuntu-latest,   r: 'release',  rtools: ''}
-   
+          - {os: macOS-latest,   r: 'release', rtools: ''}
+          - {os: windows-latest, r: 'release', rtools: '42'}
+          - {os: ubuntu-latest,   r: 'devel', rtools: '' , http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release', rtools: ''}
+       
+
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       JAGS_HOME: 'C:\JAGS-4.3.0.exe'
@@ -67,20 +70,7 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-          
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          error-on: '"error"'
-
-      - name: Show testthat output
-        if: always()
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@main
-        with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: check
