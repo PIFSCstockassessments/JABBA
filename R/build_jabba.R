@@ -174,8 +174,9 @@ build_jabba <- function(
   TC = as.numeric(Catch) # Total Catch
   
   # Catch CV option.
+  #JS corrected annual CV from "CV.C =catch.cv[,2]"
   if(add.catch.CV==TRUE){
-    if(length(catch.cv)>1) {CV.C =catch.cv[,2]} else {CV.C = rep(catch.cv,length(TC))}
+    if(length(catch.cv)>1) {CV.C =catch.cv} else {CV.C = rep(catch.cv,length(TC))}
     if(verbose)
       message("\n","><> Assume Catch with error CV = ",mean(CV.C)," <><","\n","\n")
   } else {

@@ -121,7 +121,13 @@ jabba2jags = function(jbinput, dir){
   }
 ",append=TRUE)} else if(jbinput$settings$catch.error=="random"){
   cat("
-  for(t in 1:N){
+  #JS added uniform component to early years
+  #Unrep is ~1/2 of catch, which had +/- 40% in previous assessment
+  for(t in 1:55){
+      estC[t] ~ dunif((TC[t]*0.8),(TC[t]*1.2))
+  }
+
+  for(t in 56:N){
       estC[t] ~ dlnorm(log(TC[t]),pow(CV.C[t],-2))
   }
 
