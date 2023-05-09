@@ -122,7 +122,8 @@ jabba2jags = function(jbinput, dir){
 ",append=TRUE)} else if(jbinput$settings$catch.error=="random"){
   cat("
   #JS added uniform component to early years
-  #Unrep is ~1/2 of catch, which had +/- 40% in previous assessment - reduce to 0.8,1.2?
+  #Unrep is ~1/2 of catch, which had +/- 40% in previous assessment - reduce to 0.8,1.2? 
+  #40% looks more consistent regarding 95% CIs on plot 
   for(t in 1:55){
       estC[t] ~ dunif((TC[t]*0.6),(TC[t]*1.4))
   }
