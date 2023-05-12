@@ -73,7 +73,7 @@ build_jabba <- function(
   K.prior = NULL, # prior(mu,CV) for the unfished biomass K = B0
   psi.dist = c("lnorm","beta"), # prior distribution for the initial biomass depletion B[1]/K
   psi.prior = c(0.9,0.25), # depletionprior(mu, CV) for the initial biomass depletion B[1]/K
-  rad.prior= c(target_rad_mean,CV_rad)  
+  rad.prior= c(target_rad_mean,CV_rad),  
   b.prior = c(FALSE,0.3,NA,c("bk","bbmsy","ffmsy")[1]), # depletion prior set as b.prior = c(mean,cv,yr,type=c("bk","bbmsy","ffmsy))
   BmsyK = 0.4, # Inflection point of the surplus production curve, requires Pella-Tomlinson (model = 3 | model 4)
   shape.CV = 0.3, # CV of the shape m parameters, if estimated with Pella-Tomlinson (Model 4)
