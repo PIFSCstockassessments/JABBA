@@ -20,13 +20,16 @@ jabba2jags = function(jbinput, dir){
    
 
     #Catchability coefficients
-    for(i in 1:(nq-1))
-    {
-    q[i] ~ dunif(q_bounds[1],q_bounds[2])
-    }
+    q[1] ~ dunif(q_bounds[1],q_bounds[2]) 
+    q[2] <- a.grid/(rad*rad*3.14159) 
 
+    ## removed for loop for q priors because having a deterministic q was causing problems 
+    #for(i in 1:(nq-1))
+    #{
+    #q[i] ~ dunif(q_bounds[1],q_bounds[2])
+    #}
     #Final q is the survey
-    q[nq] <- a.grid/(rad*rad*3.14159)  #q[sets.q[nq]]?
+    #q[nq] <- a.grid/(rad*rad*3.14159)  #q[sets.q[nq]]?
 
     # Process variance prior
     isigma2.est ~ dgamma(igamma[1],igamma[2])
@@ -253,7 +256,7 @@ jabba2jags = function(jbinput, dir){
         I[t, i] ~ dlnorm(Imean[t,i], survey_precision[t])
         CPUE[t,i] <- P[t]*K/(q[sets.q[nq]]*n.grid)
         Ihat[t,i]  <- exp(Imean[t,i])
-        
+
         }
         }
 
