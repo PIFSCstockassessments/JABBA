@@ -22,6 +22,7 @@
 #' @param K.prior = NULL, # prior(mu,CV) for the unfished biomass K = B0
 #' @param psi.dist = c("lnorm","beta"), # prior distribution for the initial biomass depletion B[1]/K
 #' @param psi.prior = c(0.9,0.25), # prior(mu, CV) for the initial biomass depletion B[1]/K
+#' @param rad.prior = c(target_rad_mean,CV_rad),  # radius prior 
 #' @param b.prior = c(FALSE,0.3,NA,c("bk","bbmy","ffmsy")[1]), # depletion prior set as d.prior = c(mean,cv,yr,type=c("bk","bbmsy"))
 #' @param BmsyK = 0.4, # Inflection point of the surplus production curve, requires Pella-Tomlinson (model = 3 | model 4)
 #' @param shape.CV = 0.3, # CV of the shape m parameters, if estimated with Pella-Tomlinson (Model 4)
