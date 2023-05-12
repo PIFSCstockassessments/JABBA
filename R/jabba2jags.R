@@ -15,11 +15,18 @@ jabba2jags = function(jbinput, dir){
     # Prior specifications
     eps <- 0.0000000000000000000000000000000001 # small constant
 
+    #Camera effective radius prior
+    rad ~ dlnorm(rad.pr[1], pow(rad.pr[2],-2))
+   
+
     #Catchability coefficients
-    for(i in 1:nq)
+    for(i in 1:(nq-1))
     {
     q[i] ~ dunif(q_bounds[1],q_bounds[2])
     }
+
+    #Final q is the survey
+    q[nq] <- a.grid/(rad*rad*3.14159)  #q[sets.q[nq]]?
 
     # Process variance prior
     isigma2.est ~ dgamma(igamma[1],igamma[2])
@@ -91,14 +98,14 @@ jabba2jags = function(jbinput, dir){
       ",append=TRUE)
   }else{ cat("
       # Observation variance
-           for(i in 1:nvar)
+           for(i in 1:(nvar-1))
            {
            # Observation error
            itau2[i]~ dgamma(4,0.01)
            tau2[i] <- 1/itau2[i]
            }
 
-           for(i in 1:nI)
+           for(i in 1:(nI-1))
            {
            for(t in 1:N)
            {
@@ -197,7 +204,7 @@ jabba2jags = function(jbinput, dir){
     cat("
     # Observation equation in related to EB
 
-    for(i in 1:nI)
+    for(i in 1:(nI-1))
     {
     for (t in 1:N)
     {
@@ -208,13 +215,26 @@ jabba2jags = function(jbinput, dir){
 
     }}
 
+
+     for(i in nI){ ## added for BFISH index
+      for (t in 68:N){ 
+        
+        Imean[t,i] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,i]))  #( ivar.obs[t,i])
+        I[t, i] ~ dlnorm(Imean[t,i], survey_precision[t])
+        CPUE[t,i] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+        Ihat[t,i]  <- exp(Imean[t,i])
+
+        }
+        }
+
   ",append=TRUE)}
   
     if(jbinput$settings$CatchOnly==TRUE){
       cat("
     # Observation equation in related to EB
     one <- sets.q
-    for(i in 1:nI)
+    for(i in 1:(nI-1))
     {
     for (t in 1:N)
     {
@@ -224,6 +244,18 @@ jabba2jags = function(jbinput, dir){
     Ihat[t,i]  <- exp(Imean[t,i])
 
     }}
+
+    for(i in nI){ ## added for BFISH index
+      for (t in 68:N){ 
+        
+        Imean[t,i] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,i]))  #( ivar.obs[t,i])
+        I[t, i] ~ dlnorm(Imean[t,i], survey_precision[t])
+        CPUE[t,i] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+        Ihat[t,i]  <- exp(Imean[t,i])
+        
+        }
+        }
 
   ",append=TRUE)} 
     

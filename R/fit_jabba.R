@@ -413,7 +413,7 @@ fit_jabba = function(jbinput,
   #-----------------------------------
   # Note posteriors of key parameters
   #-----------------------------------
-  sel.par = c(1,2,7,4,3,5)
+  sel.par = c(1,2,7,4,3,5,23) #JS added 23 - radius
   if(!settings$Auxiliary){
   out=data.frame(posteriors[params[sel.par]])
   } else {

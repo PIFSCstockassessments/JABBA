@@ -73,6 +73,7 @@ build_jabba <- function(
   K.prior = NULL, # prior(mu,CV) for the unfished biomass K = B0
   psi.dist = c("lnorm","beta"), # prior distribution for the initial biomass depletion B[1]/K
   psi.prior = c(0.9,0.25), # depletionprior(mu, CV) for the initial biomass depletion B[1]/K
+  rad.prior= c(target_rad_mean,CV_rad)  
   b.prior = c(FALSE,0.3,NA,c("bk","bbmsy","ffmsy")[1]), # depletion prior set as b.prior = c(mean,cv,yr,type=c("bk","bbmsy","ffmsy))
   BmsyK = 0.4, # Inflection point of the surplus production curve, requires Pella-Tomlinson (model = 3 | model 4)
   shape.CV = 0.3, # CV of the shape m parameters, if estimated with Pella-Tomlinson (Model 4)
@@ -332,9 +333,21 @@ build_jabba <- function(
     log.K = log(K.prior[1])#-0.5*sd.K^2
   }
   
+  #JS added radius prior
+#----------------------------------------------------
+# Prepare radius prior
+#----------------------------------------------------
+
+if(!is.null(target_rad_mean)){
+  log.rad = log(target_rad_mean)
+  CV.rad = CV_rad
+  sd.rad = sqrt(log(CV.rad^2+1))
+}
   
-  
-  
+### JS Added for calculating effective area radius priors ###################
+rad.pr = plot_lnorm(mu = log(target_rad_mean), CV_rad, Prior = "Radius")
+#dev.off() 
+
   # Get input priors
   K.pr = plot_lnorm(exp(log.K),CV.K,Prior="K")
   r.pr = plot_lnorm(mu=exp(log.r),CV=CV.r,Prior="r")
@@ -429,7 +442,7 @@ build_jabba <- function(
   
   
   # JABBA input data
-  surplus.dat = list(N=n.years, TC = TC,I=CPUE,SE2=se2,r.pr=r.pr,psi.pr=psi.pr,K.pr = K.pr,
+  surplus.dat = list(N=n.years, TC = TC,I=CPUE,SE2=se2,r.pr=r.pr,psi.pr=psi.pr,K.pr = K.pr,rad.pr=rad.pr,n.grid=n.grid,a.grid=a.grid,s_lambda=s_lambda,
                      nq=nq,nI = nI,nvar=nvar,sigma.fixed=ifelse(sigma.proc==TRUE,0,sigma.proc),
                      sets.var=sets.var, sets.q=sets.q,Plim=Plim,slope.HS=slope.HS,
                      nTAC=nTAC,pyrs=pyrs,TAC=TAC,igamma = igamma,stI=stI,pen.P = rep(0,n.years) ,pen.bk = rep(0,n.years),proc.pen=0,K.pen = 0,
@@ -438,7 +451,7 @@ build_jabba <- function(
   
   
   # PARAMETERS TO MONITOR
-  params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","TOE")
+  params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","TOE","rad")
   
   
   #-----------------------------------------------
