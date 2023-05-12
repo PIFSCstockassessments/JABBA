@@ -438,7 +438,7 @@ rad.pr = plot_lnorm(mu = log(target_rad_mean), CV_rad, Prior = "Radius")
   stI = ifelse(proc.dev.all==TRUE,1, c(1:n.years)[is.na(apply(CPUE,1,mean,na.rm=TRUE))==FALSE][1]) #first year with CPUE
   
   # starting values
-  nq = length(unique(sets.q))-1 #JS change to 1
+  nq = length(unique(sets.q)) #JS subtract 1?
   nvar = length(unique(sets.var))
   
   
