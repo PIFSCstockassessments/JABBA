@@ -169,7 +169,7 @@ fit_jabba = function(jbinput,
   #-----------------------------------------------------------
   
   # run some mcmc convergence tests
-  par.dat= data.frame(posteriors[params[c(1:7)]])
+  par.dat= data.frame(posteriors[params[c(1:7,23)]]) #JS added 23 for rad
   
   geweke = coda::geweke.diag(data.frame(par.dat))
   pvalues <- 2*pnorm(-abs(geweke$z))
