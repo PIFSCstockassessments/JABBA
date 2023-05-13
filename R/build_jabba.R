@@ -366,8 +366,8 @@ rad.pr = plot_lnorm(mu = log(target_rad_mean), CV_rad, Prior = "Radius")
   
   
   # Note PRIORS and save input subfolder
-  Priors =rbind(c(K.pr[1],CV.K),psi.prior,c(r.pr[1],CV.r))
-  row.names(Priors) = c("K","Psi","r")
+  Priors =rbind(c(K.pr[1],CV.K),psi.prior,c(r.pr[1],CV.r),c(rad.pr[1],CV_rad)) #JS added rad
+  row.names(Priors) = c("K","Psi","r", "Rad")
   colnames(Priors) = c("Mean","CV")
   Priors = data.frame(Priors)
   Priors$log.sd = sqrt(log(Priors[,2]^2+1))
