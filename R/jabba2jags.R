@@ -277,7 +277,7 @@ jabba2jags = function(jbinput, dir){
 
 
     # Enforce soft penalty on observation error if sigma.obs > sigma_bound
-    for(i in 1:nvar){
+    for(i in 1:(nvar-1)){    #JS - may need to add -1 here...
     obs.pen[i] ~ dnorm(penObs[i],1000) # enforce penalty
     penObs[i]  <- ifelse(pow(tau2[i],0.5)>sigmaobs_bound,log(pow(tau2[i],0.5))-log(sigmaobs_bound),0)
     }
