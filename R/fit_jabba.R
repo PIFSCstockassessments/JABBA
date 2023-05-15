@@ -266,7 +266,7 @@ fit_jabba = function(jbinput,
     StResid = NULL
     
     if(settings$CatchOnly==FALSE){
-    for(i in 1:n.indices){
+    for(i in 1:(n.indices-1)){   #JS added -1
       Resids =rbind(Resids,log(CPUE[,i])-log(apply(posteriors$CPUE[,,i],2,quantile,c(0.5))))
     
       StResid =rbind(StResid,log(CPUE[,i]/apply(posteriors$CPUE[,,i],2,quantile,c(0.5)))/
@@ -303,7 +303,7 @@ fit_jabba = function(jbinput,
       Yr = min(Yr):max(Yr)
       yr = Yr-min(years)+1
     
-    for(i in 1:n.indices){
+    for(i in 1:(n.indices-1)){   #JS added -1
       exp.i = apply(posteriors$CPUE[,,i],2,quantile,c(0.5))[is.na(cpue[,i+1])==F]
       se.i = apply(posteriors$CPUE[,,i],2,sd)[is.na(cpue[,i+1])==F]
       expLCI.i = apply(posteriors$Ihat[,,i],2,quantile,c(0.025))[is.na(cpue[,i+1])==F]
@@ -370,7 +370,7 @@ fit_jabba = function(jbinput,
   # Predicted CPUE
   #----------------------------------
   cpue.hat = array(data=NA,dim=c(N,5,n.indices),list(years,c("mu","lci","uci","se","obserror"),names(cpue[,-1])))
-  for(i in 1:n.indices){
+  for(i in 1:(n.indices-1)){  #JS added -1 
     cpue.hat[,,i] = cbind(t(apply(posteriors$Ihat[,,i],2,quantile,c(0.5,0.025,0.975))),apply(log(posteriors$Ihat[,,i]),2,sd),(apply(posteriors$TOE[,,i],2,quantile,c(0.5))))
   }
   #------------------------------------
@@ -378,7 +378,7 @@ fit_jabba = function(jbinput,
   #------------------------------------
   
   cpue.ppd = array(data=NA,dim=c(N,5,n.indices),list(years,c("mu","lci","uci","se","obserror"),names(cpue[,-1])))
-  for(i in 1:n.indices){
+  for(i in 1:(n.indices-1)){ #JS added -1
     cpue.ppd[,,i] = cbind(t(apply(posteriors$CPUE[,,i],2,quantile,c(0.5,0.025,0.975))),apply(log(posteriors$CPUE[,,i]),2,sd),(apply(posteriors$TOE[,,i],2,quantile,c(0.5))))
   }
 }
@@ -390,7 +390,7 @@ fit_jabba = function(jbinput,
     # Predicted CPUE
     #----------------------------------
     cpue.hat = array(data=NA,dim=c(N,5,n.indices+nA),list(years,c("mu","lci","uci","se","obserror"),c(names(cpue)[-1],names(auxiliary)[-1])))
-    for(i in 1:n.indices){
+    for(i in 1:(n.indices-1)){ #JS added -1
       cpue.hat[,,i] = cbind(t(apply(posteriors$Ihat[,,i],2,quantile,c(0.5,0.025,0.975))),apply(log(posteriors$Ihat[,,i]),2,sd),(apply(posteriors$TOE[,,i],2,quantile,c(0.5))))
     }
     for(i in 1:nA){
@@ -401,7 +401,7 @@ fit_jabba = function(jbinput,
     #------------------------------------
     
     cpue.ppd = array(data=NA,dim=c(N,5,n.indices+nA),list(years,c("mu","lci","uci","se","obserror"),c(names(cpue)[-1],names(auxiliary)[-1])))
-    for(i in 1:n.indices){
+    for(i in 1:(n.indices-1)){ #JS added -1
       cpue.ppd[,,i] = cbind(t(apply(posteriors$CPUE[,,i],2,quantile,c(0.5,0.025,0.975))),apply(log(posteriors$CPUE[,,i]),2,sd),(apply(posteriors$TOE[,,i],2,quantile,c(0.5))))
     }
     for(i in 1:nA){
