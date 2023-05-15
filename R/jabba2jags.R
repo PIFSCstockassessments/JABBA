@@ -81,14 +81,14 @@ jabba2jags = function(jbinput, dir){
   if(jbinput$settings$sigma.est==TRUE){
     cat("
       # Observation variance
-      for(i in 1:nvar)
+      for(i in 1:(nvar-1))  #JS added -1
       {
       # Observation error
       itau2[i]~ dgamma(0.001,0.001)
       tau2[i] <- 1/itau2[i]
       }
 
-      for(i in 1:nI)
+      for(i in 1:(nI-1)) #JS added -1
       {
       for(t in 1:N)
       {
