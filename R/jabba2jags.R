@@ -85,7 +85,7 @@ jabba2jags = function(jbinput, dir){
       for(i in 1:(nvar-1))  #JS added -1
       {
       # Observation error
-      itau2[i]~ dgamma(0.001,0.001)
+      itau2[i]~ dgamma(0.2,1.0)    #These are (0.001,0.001) OR (0.2,1.0) in previous assessment
       tau2[i] <- 1/itau2[i]
       }
 
