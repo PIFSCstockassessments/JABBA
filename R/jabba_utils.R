@@ -171,6 +171,7 @@ jbruns_sig3 <- function(x,type=NULL,mixing="less") {
 #' @param index option to plot specific indices (numeric & in order)
 #' @export
 #' @examples 
+#' \dontrun{
 #' data(iccat)
 #' bet= iccat$bet
 #' jb = build_jabba(catch=bet$catch,cpue=bet$cpue,se=bet$se,assessment="BET",scenario = "Ref",model.type = "Pella",igamma = c(0.001,0.001),verbose=FALSE)
@@ -178,6 +179,7 @@ jbruns_sig3 <- function(x,type=NULL,mixing="less") {
 #' jbrunstest(fit)
 #' jbrunstest(fit,index=2)
 #' jbplot_runstest(fit,verbose=FALSE)
+#' }
 
 jbrunstest <- function(jabba,index=NULL,mixing="less"){
     
@@ -218,6 +220,7 @@ jbrunstest <- function(jabba,index=NULL,mixing="less"){
 #' @return Mohn's rho statistic for several quantities
 #' @export
 #' @examples 
+#' \dontrun{
 #' data(iccat)
 #' bet= iccat$bet
 #' jb = build_jabba(catch=bet$catch,cpue=bet$cpue,se=bet$se,assessment="BET",scenario = "Ref",model.type = "Pella",igamma = c(0.001,0.001),verbose=FALSE)
@@ -226,6 +229,7 @@ jbrunstest <- function(jabba,index=NULL,mixing="less"){
 #' jbretro(hc)
 #' jbplot_retro(hc)
 #' jbplot_retro(hc,forecast=TRUE) # with retro forecasting
+#' }
 
 jbretro <- function(hc,type=c("B","F","BBmsy","FFmsy","procB","SP"),forecast=TRUE){
   

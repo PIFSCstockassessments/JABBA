@@ -14,6 +14,7 @@
 #' @return data.frame of kobe posterior model + forecast scenarios
 #' @export
 #' @examples
+#' \dontrun{
 #' data(iccat)
 #' whm = iccat$whm
 #' # ICCAT white marlin setup
@@ -24,6 +25,7 @@
 #' jbplot_hcxval(hc,index=c(8,11))
 #' hc.ar1 = jbhcxval(hc,AR1=TRUE) # do hindcasting with AR1
 #' jbplot_hcxval(hc.ar1,index=c(8,11))
+#' }
 
 # {{{
 jbhcxval <- function(hindcasts,
