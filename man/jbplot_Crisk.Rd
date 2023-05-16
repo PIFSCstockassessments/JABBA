@@ -149,6 +149,7 @@ It will be separated from default name by an underscore.}
 Plots plots JABBA ensemble models + projections - joint or by run
 }
 \examples{
+\dontrun{
 data(iccat)
 bet = iccat$bet 
 # Fit Fox and Schaefer
@@ -163,6 +164,7 @@ jbplot_Crisk(prjc,subplots=2)
 jbplot_Crisk(prjc,subplots=3) # MSST as (1-0.5)*Bmsy with bfrac =0.5
 jbplot_Crisk(prjc,subplots=3, bfrac=0.2,bref="b0") # Blim = 0.2 B0
 jbplot_Crisk(prjc,subplots=3, bfrac=0.2,bref="b0",ylabs=expression(B/B[lim])) # Blim = 0.2 B0
+}
 }
 \author{
 Mostly adopted from ss3diags::SSplotEnsemble
