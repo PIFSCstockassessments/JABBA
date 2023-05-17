@@ -58,5 +58,7 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Run tests
-        run: Rscript -e "source('tests/testthat.R')"
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          error-on: '"error"'
