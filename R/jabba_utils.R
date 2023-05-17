@@ -464,9 +464,10 @@ jbmase <- function(hc,naive.min=0.1,index=NULL,residuals=FALSE,verbose=TRUE){
 #' Computes the Z[t] from catch-at-age data
 #' @param ca data.frame input with column names year, age, data
 #' @param ages for which the z slope is taken
+#' @param catch.n dataframe of catch.n
 #' @return data.frame with data = z
 #' @export
-zage =  function(ca,ages = "missing"){
+zage =  function(ca,ages = "missing", catch.n){
   out=NULL
   CN = catch.n
   years=unique(CN$year)
