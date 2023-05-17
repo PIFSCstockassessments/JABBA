@@ -738,7 +738,8 @@ jbplot_stdresiduals <- function(jabba, output.dir=getwd(),as.png=FALSE,add=FALSE
 #' @param height plot hight
 #' @param verbose silent option
 #' @export
-#' @examples 
+#' @examples
+#' \dontrun{ 
 #' data(iccat)
 #' bet= iccat$bet
 #' jb = build_jabba(catch=bet$catch,cpue=bet$cpue,se=bet$se,assessment="BET",scenario = "Ref",model.type = "Pella",igamma = c(0.001,0.001),verbose=FALSE)
@@ -746,6 +747,7 @@ jbplot_stdresiduals <- function(jabba, output.dir=getwd(),as.png=FALSE,add=FALSE
 #' jbrunstest(fit)
 #' jbrunstest(fit,index=2)
 #' jbplot_runstest(fit,verbose=FALSE)
+#' }
 
 jbplot_runstest <- function(jabba,index=NULL,mixing="less", output.dir=getwd(),add=FALSE,as.png=FALSE,single.plots=add,width=NULL,height=NULL,verbose=TRUE){
   if(as.png==TRUE) add=FALSE
@@ -1409,6 +1411,7 @@ jabba_plots = function(jabba,output.dir = getwd(),as.png=TRUE,statusplot ="kobe"
 #' @return Mohn's rho statistic for several quantaties
 #' @export
 #' @examples 
+#' \dontrun{
 #' data(iccat)
 #' bet= iccat$bet
 #' jb = build_jabba(catch=bet$catch,cpue=bet$cpue,se=bet$se,assessment="BET",scenario = "Ref",model.type = "Pella",igamma = c(0.001,0.001),verbose=FALSE)
@@ -1416,6 +1419,7 @@ jabba_plots = function(jabba,output.dir = getwd(),as.png=TRUE,statusplot ="kobe"
 #' hc = hindcast_jabba(jbinput=jb,fit=fit,peels=1:3)
 #' jbplot_retro(hc)
 #' jbplot_retro(hc,forecast=TRUE) # with retro forecasting
+#' }
 
 jbplot_retro <- function(hc,type=c("B","F","BBmsy","FFmsy","procB","SP"),forecast=FALSE,ylabs=NULL,
                          add=F,output.dir=getwd(),as.png=FALSE,single.plots=add,width=NULL,height=NULL,xlim=NULL,cols=NULL,legend.loc="topright",verbose=TRUE){

@@ -19,7 +19,7 @@ Inbuilt JABBA features include:
 
 ## Installing JABBA as R package
 
-`library(devtools)` <br>
+`library(remotes)` <br>
 `install_github("jabbamodel/JABBA")`
 
 To install the PIFSC-dev branch use:

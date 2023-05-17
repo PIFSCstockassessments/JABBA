@@ -24,6 +24,7 @@ Mohn's rho statistic for several quantities
 Quantities retrospective pattern of B, F, BBmsy, FFmsy, BB0 and SP #'
 }
 \examples{
+\dontrun{
 data(iccat)
 bet= iccat$bet
 jb = build_jabba(catch=bet$catch,cpue=bet$cpue,se=bet$se,assessment="BET",scenario = "Ref",model.type = "Pella",igamma = c(0.001,0.001),verbose=FALSE)
@@ -32,4 +33,5 @@ hc = hindcast_jabba(jbinput=jb,fit=fit,peels=1:3)
 jbretro(hc)
 jbplot_retro(hc)
 jbplot_retro(hc,forecast=TRUE) # with retro forecasting
+}
 }
