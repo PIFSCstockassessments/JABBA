@@ -21,8 +21,8 @@ jabba2jags = function(jbinput, dir){
 
     #Catchability coefficients
     q[1] ~ dunif(q_bounds[1],q_bounds[2]) 
-    #q[2] ~ dunif(q_bounds[1],q_bounds[2])  #comment out q2 for single series and change q[3] below
-    q[2] <- a.grid/(rad*rad*3.14159)  #change to q[2] for single series, q[3] for checking with previous series
+    q[2] ~ dunif(q_bounds[1],q_bounds[2])  #comment out q2 for single series and change q[3] below
+    q[3] <- a.grid/(rad*rad*3.14159)  #change to q[2] for single series, q[3] for checking with previous series
  
     ## removed for loop for q priors because having a deterministic q was causing problems 
     #for(i in 1:(nq-1))
