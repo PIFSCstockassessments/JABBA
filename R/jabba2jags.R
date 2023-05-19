@@ -13,25 +13,41 @@ jabba2jags = function(jbinput, dir){
     model {
 
     # Prior specifications
-    eps <- 0.0000000000000000000000000000000001 # small constant
+    eps <- 0.0000000000000000000000000000000001 # small constant")
 
-    #Camera effective radius prior
-    rad ~ dlnorm(rad.pr[1], pow(rad.pr[2],-2))
-   
+if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 1){
+  cat("
+  #Camera effective radius prior
+    rad ~ dlnorm(rad.pr[1], pow(rad.pr[2],-2))T(7.5,60.6)
 
-    #Catchability coefficients
-    q[1] ~ dunif(q_bounds[1],q_bounds[2]) 
-    #q[2] ~ dunif(q_bounds[1],q_bounds[2])  #comment out q2 for single series and change q[3] below
-    q[2] <- a.grid/(rad*rad*3.14159)  #change to q[2] for single series, q[3] for checking with previous series
- 
-    ## removed for loop for q priors because having a deterministic q was causing problems 
-    #for(i in 1:(nq-1))
-    #{
-    #q[i] ~ dunif(q_bounds[1],q_bounds[2])
-    #}
-    #Final q is the survey
-    #q[nq] <- a.grid/(rad*rad*3.14159)  #q[sets.q[nq]]?
+    q[1] ~ dunif(q_bounds[1], q_bounds[2])
+    q[2] <- a.grid/(rad*rad*3.14159) 
 
+  ", append = TRUE)
+
+} else if(length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 2){
+
+  cat("
+   #Camera effective radius prior
+    rad ~ dlnorm(rad.pr[1], pow(rad.pr[2],-2))T(7.5,60.6)
+
+    q[1] ~ dunif(q_bounds[1], q_bounds[2])
+    q[2] ~ dunif(q_bounds[1], q_bounds[2])
+    q[3] <- a.grid/(rad*rad*3.14159) 
+  
+  ", append = TRUE)
+
+} else{
+    cat("
+    #Catchability coefficient
+    for(i in 1:nq)
+    {
+      q[i] ~ dunif(q_bounds[1], q_bounds[2])
+    }
+    ", append = TRUE)
+}
+  
+  cat("
     # Process variance prior
     isigma2.est ~ dgamma(igamma[1],igamma[2])
 
@@ -41,7 +57,7 @@ jabba2jags = function(jbinput, dir){
     # informative priors for Hmsy as a function of r
     r ~ dlnorm(log(r.pr[1]),pow(r.pr[2],-2))
 
-    ")
+    ", append = TRUE)
   
   if(jbinput$settings$model.id==4){
     cat("
@@ -82,7 +98,7 @@ jabba2jags = function(jbinput, dir){
   if(jbinput$settings$sigma.est==TRUE){
     cat("
       # Observation variance
-      for(i in 1:(nvar-1))  #JS added -1
+      for(i in 1:(nvar))  #JS added -1 #MO removed
       {
       # Observation error
       itau2[i]~ dgamma(0.2,1.0)    #These are (0.001,0.001) OR (0.2,1.0) in previous assessment
@@ -102,7 +118,7 @@ jabba2jags = function(jbinput, dir){
       ",append=TRUE)
   }else{ cat("
       # Observation variance
-           for(i in 1:(nvar-1))
+           for(i in 1:(nvar)) #MO removed
            {
            # Observation error
            itau2[i]~ dgamma(4,0.01)
@@ -278,7 +294,7 @@ jabba2jags = function(jbinput, dir){
 
 
     # Enforce soft penalty on observation error if sigma.obs > sigma_bound
-    for(i in 1:(nvar-1)){    #JS - may need to add -1 here...
+    for(i in 1:(nvar)){    #JS - may need to add -1 here... #MO removed
     obs.pen[i] ~ dnorm(penObs[i],1000) # enforce penalty
     penObs[i]  <- ifelse(pow(tau2[i],0.5)>sigmaobs_bound,log(pow(tau2[i],0.5))-log(sigmaobs_bound),0)
     }
