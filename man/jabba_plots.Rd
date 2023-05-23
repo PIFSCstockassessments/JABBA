@@ -9,7 +9,8 @@ jabba_plots(
   output.dir = getwd(),
   as.png = TRUE,
   statusplot = "kobe",
-  verbose = TRUE
+  verbose = TRUE,
+  bfrac = NULL
 )
 }
 \arguments{
@@ -19,7 +20,11 @@ jabba_plots(
 
 \item{as.png}{save as png file of TRUE}
 
+\item{statusplot}{can be "kobe", or "bfrac". "kobe" produces the traditional quandrants, "bfrac" produces quandrants based on state-dependent reference points (added for PIFSC use)}
+
 \item{verbose}{silent option}
+
+\item{bfrac}{Fraction of BMSY to use for Kobe plot (e.g. bfrac = (1-M)), if including set statusplot to "bfrac"}
 }
 \description{
 plots all routine JABBA plot to output.dir if as.png=TRUE (default)

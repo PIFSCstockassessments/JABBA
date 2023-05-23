@@ -15,6 +15,18 @@ jbplot_kobe(
   height = 4.5,
   verbose = TRUE
 )
+
+jbplot_kobe(
+  jabba,
+  ylab = NULL,
+  xlab = NULL,
+  output.dir = getwd(),
+  as.png = FALSE,
+  add = FALSE,
+  width = 5,
+  height = 4.5,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{jabba}{output list from fit_jabba}

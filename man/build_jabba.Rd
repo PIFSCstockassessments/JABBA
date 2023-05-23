@@ -24,6 +24,11 @@ build_jabba(
   K.prior = NULL,
   psi.dist = c("lnorm", "beta"),
   psi.prior = c(0.9, 0.25),
+  index_type = NULL,
+  rad.prior = NULL,
+  n.grid = NULL,
+  a.grid = NULL,
+  s_lambda = NULL,
   b.prior = c(FALSE, 0.3, NA, c("bk", "bbmsy", "ffmsy")[1]),
   BmsyK = 0.4,
   shape.CV = 0.3,
@@ -92,6 +97,16 @@ PRIORS}
 \item{psi.dist}{= c("lnorm","beta"), # prior distribution for the initial biomass depletion B[1]/K}
 
 \item{psi.prior}{= c(0.9,0.25), # prior(mu, CV) for the initial biomass depletion B[1]/K}
+
+\item{index_type}{default NULL, use "absolute" for surveys of absolute abundance estimates (eg BFISH older version) or "relative" for surveys of relative abundance, vector length of ncol(cpue)-1}
+
+\item{rad.prior}{default NULL, if including radius prior: c(target_rad_mean,CV_rad),}
+
+\item{n.grid}{NULL, number of sampling grids in a domain}
+
+\item{a.grid}{NULL, area within a sampling grid}
+
+\item{s_lambda}{NULL, for uncertainty with BFISH survey}
 
 \item{b.prior}{= c(FALSE,0.3,NA,c("bk","bbmy","ffmsy")[1]), # depletion prior set as d.prior = c(mean,cv,yr,type=c("bk","bbmsy"))}
 
