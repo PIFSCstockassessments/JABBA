@@ -176,7 +176,12 @@ fit_jabba = function(jbinput,
   #-----------------------------------------------------------
   
   # run some mcmc convergence tests
-  par.dat= data.frame(posteriors[params[c(1:7,23)]]) #JS added 23 for rad
+  if(length(grep("rad", params)) > 0){
+    par.dat= data.frame(posteriors[params[c(1:7,25)]]) #25 for rad
+  }else{
+    par.dat= data.frame(posteriors[params[c(1:7)]]) 
+  }
+  
   
   geweke = coda::geweke.diag(data.frame(par.dat))
   pvalues <- 2*pnorm(-abs(geweke$z))
@@ -205,7 +210,7 @@ fit_jabba = function(jbinput,
   results = data.frame(Median = results[,2],LCI=results[,1],UCI=results[,3],Geweke.p=round(pvalues,3),Heidel.p = round(heidle[,3],3))
   #JS added Overfishing ref point below, need to check dims
   #ref.points = round(t(cbind(apply(man.dat[,1:4],2,quantile,c(0.025,0.5,0.975)),sum(man.dat[,5])/dim(man.dat)[2])),3)
-  ref.points = round(t(cbind(apply(man.dat[,1:5],2,quantile,c(0.025,0.5,0.975)))),3)
+  ref.points = round(t(cbind(apply(man.dat,2,quantile,c(0.025,0.5,0.975)))),3)
  
   ref.points = data.frame(Median = ref.points[,2],LCI=ref.points[,1],UCI=ref.points[,3])
   # get number of parameters
@@ -431,7 +436,12 @@ fit_jabba = function(jbinput,
   #-----------------------------------
   # Note posteriors of key parameters
   #-----------------------------------
-  sel.par = c(1,2,7,4,3,5,23) #JS added 23 - radius
+  if(length(grep("rad", params)) > 0){
+    sel.par = c(1,2,7,4,3,5,25) #MO added 25 - radius
+  }else{
+    sel.par = c(1,2,7,4,3,5) 
+  }
+  
   if(!settings$Auxiliary){
   out=data.frame(posteriors[params[sel.par]])
   } else {
