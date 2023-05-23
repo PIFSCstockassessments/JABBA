@@ -1218,10 +1218,10 @@ jbplot_kobe_bfrac <- function(){
 
 mu.f = jabba$timeseries[,,"FFmsy"]
 mu.b = jabba$timeseries[,,"BBmsy"]
-f = jabba$kobe$harvest
 b = jabba$kobe$stock
 years=jabba$yr
 N = length(years)
+of = jabba$posteriors$Overfishing_ind[,N] #probability of overfishing in terminal year
 # fit kernel function
 kernelF <- gplots::ci2d(b,f,nbins=151,factor=1.5,ci.levels=c(0.50,0.80,0.75,0.90,0.95),show="none",col=1,xlab= ifelse(jabba$settings$harvest.label=="Fmsy",expression(paste(F/F[MSY])),expression(paste(H/H[MSY]))),ylab=expression(paste(B/B[MSY])))
 
@@ -1269,10 +1269,10 @@ points(mu.b[sel.yr,1],mu.f[sel.yr,1],col=
          1,pch=c(22,21,24),bg="white",cex=1.9)
 
          # Get Probability
-Pr.green = sum(ifelse(b>MSST_x & f<1,1,0))/length(b)*100
-Pr.red = sum(ifelse(b<MSST_x & f>1,1,0))/length(b)*100
-Pr.yellow = sum(ifelse(b<MSST_x & f<1,1,0))/length(b)*100
-Pr.orange = sum(ifelse(b>MSST_x & f>1,1,0))/length(b)*100
+Pr.green = sum(ifelse(b>MSST_x & of<1,1,0))/length(b)*100
+Pr.red = sum(ifelse(b<MSST_x & of>1,1,0))/length(b)*100
+Pr.yellow = sum(ifelse(b<MSST_x & of<1,1,0))/length(b)*100
+Pr.orange = sum(ifelse(b>MSST_x & of>1,1,0))/length(b)*100
 
 sel.years = c(years[sel.yr])
 ## Add legend
