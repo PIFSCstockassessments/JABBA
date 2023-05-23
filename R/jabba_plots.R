@@ -1193,6 +1193,95 @@ jbplot_kobe <-  function(jabba ,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=F
   if(as.png==TRUE){dev.off()}
 } # End of Kobe plot
 
+#---------------------------------------------------------
+# Produce state-dependent reference point Kobe plot
+#---------------------------------------------------------
+
+#' Kobe plot with state-dependent reference point
+#' 
+#' Used for PIFSC stocks where reference points are BMSY(1-M)
+#' @param jabba output list from fit_jabba
+#' @param output.dir directory to save plots
+#' @param ylab yaxis label
+#' @param xlab xaxis label
+#' @param as.png save as png file of TRUE
+#' @param add if true don't call par() to allow construction of multiplots
+#' @param width plot width
+#' @param height plot height
+#' @param verbose silent option
+#' @export
+jbplot_kobe_bfrac <- function(){
+
+ if(verbose) cat(paste0("\n","><> jbplot_kobe_bfrac() - Stock Status Plot  <><","\n"))
+
+mu.f = jabba$timeseries[,,"FFmsy"]
+mu.b = jabba$timeseries[,,"BBmsy"]
+f = jabba$kobe$harvest
+b = jabba$kobe$stock
+years=jabba$yr
+N = length(years)
+# fit kernel function
+kernelF <- gplots::ci2d(b,f,nbins=151,factor=1.5,ci.levels=c(0.50,0.80,0.75,0.90,0.95),show="none",col=1,xlab= ifelse(jabba$settings$harvest.label=="Fmsy",expression(paste(F/F[MSY])),expression(paste(H/H[MSY]))),ylab=expression(paste(B/B[MSY])))
+
+Par = list(mfrow=c(1,1),mar = c(3.5, 3.5, 0.1, 0.1), mgp =c(2.,0.5,0), tck = -0.02,cex=0.8)
+if(as.png==TRUE){ png(file = paste0(output.dir,"/Kobe_",jabba$assessment,"_",jabba$scenario,".png"), width = width, height = height,
+                      res = 200, units = "in")}
+if(add==FALSE) par(Par)
+
+#Create plot
+if(is.null(ylab)) ylab=ifelse(jabba$settings$harvest.label=="Fmsy",expression(paste(F/F[MSY])),expression(paste(H/H[MSY])))
+if(is.null(xlab)) xlab=expression(paste(B/(B[MSY](1-M))))
+
+plot(1000,1000,type="b", xlim=c(0,max(1/(jabba$refpts$bmsy/jabba$refpts$k)[1],mu.b[,1]) +0.05), ylim=c(0,max(mu.f[,1],quantile(f,0.85),2.)),lty=3,ylab=ylab,xlab=xlab,xaxs="i",yaxs="i")
+
+# Kobe plot layout setting
+x_max  <- max(1/(jabba$refpts$bmsy/jabba$refpts$k)[1],mu.b[,1])
+x_min  <- 0
+y_max  <- max(mu.f[,1],quantile(f,0.85),2.)
+y_min  <- 0
+MSST_x <- max(0.5,bfrac) #bfrac = 1-M
+max_yr <- max(years)
+
+## Overfished triangles/trapezoids
+tri_y  <- c(y_min,1,y_min)  
+tri_x  <- c(x_min,MSST_x,MSST_x)
+poly_y <- c(y_min,y_max,y_max,1)
+poly_x <- c(x_min,x_min,MSST_x,MSST_x)
+
+polygon(x = c(MSST_x, x_max, x_max, MSST_x), y = c(1,1, y_min, y_min),col="palegreen3",border=0)
+polygon(x = tri_x, y = tri_y, col="gold",border=0)
+polygon(x = c(MSST_x,x_max,x_max,MSST_x), y = c(1,1,y_max,y_max),col="darkorange",border=0)
+polygon(x = poly_x, y = poly_y, col="brown2",border=0)
+
+polygon(kernelF$contours$"0.95",lty=2,border=NA,col="cornsilk4")
+polygon(kernelF$contours$"0.8",border=NA,lty=2,col="grey")
+polygon(kernelF$contours$"0.5",border=NA,lty=2,col="cornsilk2")
+
+points(mu.b[,1],mu.f[,1],pch=16,cex=1)
+lines(x = c(MSST_x, x_max), y = c(1,1), lty = 3, lwd = 0.7)
+lines(x = c(x_min, MSST_x), y = c(y_min, 1), lty = 3, lwd = 0.7)
+lines(x = c(MSST_x, MSST_x), y = c(y_min, y_max), lty = 3, lwd = 0.7)
+lines(mu.b[,1],mu.f[,1], lty=1,lwd=1.)
+sel.yr = c(1,round(quantile(1:N,0.7),0),N)
+points(mu.b[sel.yr,1],mu.f[sel.yr,1],col=
+         1,pch=c(22,21,24),bg="white",cex=1.9)
+
+         # Get Probability
+Pr.green = sum(ifelse(b>MSST_x & f<1,1,0))/length(b)*100
+Pr.red = sum(ifelse(b<MSST_x & f>1,1,0))/length(b)*100
+Pr.yellow = sum(ifelse(b<MSST_x & f<1,1,0))/length(b)*100
+Pr.orange = sum(ifelse(b>MSST_x & f>1,1,0))/length(b)*100
+
+sel.years = c(years[sel.yr])
+## Add legend
+
+legend('topright',
+       c(paste(sel.years),"50% C.I.","80% C.I.","95% C.I.",paste0(round(c(Pr.red,Pr.yellow,Pr.orange,Pr.green),1),"%")),
+       lty=c(1,1,1,rep(-1,8)),pch=c(22,21,24,rep(22,8)),pt.bg=c(rep("white",3),"cornsilk2","grey","cornsilk4","brown2","gold","darkorange","palegreen3"),
+       col=1,lwd=1.1,cex=0.9,pt.cex=c(rep(1.3,3),rep(1.7,3),rep(2.2,4)),bty="n")
+
+}
+
 
 #---------------------------------------------------------
 # Produce 'post-modern' biplot (see Quinn and Collie 2005)
@@ -1366,8 +1455,10 @@ jbplot_bprior <- function(jabba, output.dir=getwd(),as.png=FALSE,add=FALSE,width
 #' @param output.dir directory to save plots
 #' @param as.png save as png file of TRUE
 #' @param verbose silent option
+#' @param bfrac Fraction of BMSY to use for Kobe plot (e.g. bfrac = (1-M)), if including set statusplot to "bfrac"
+#' @param statusplot can be "kobe", or "bfrac". "kobe" produces the traditional quandrants, "bfrac" produces quandrants based on state-dependent reference points (added for PIFSC use)
 #' @export
-jabba_plots = function(jabba,output.dir = getwd(),as.png=TRUE,statusplot ="kobe",verbose=TRUE){
+jabba_plots = function(jabba,output.dir = getwd(),as.png=TRUE,statusplot ="kobe",verbose=TRUE,bfrac=NULL){
 
   jbplot_catch(jabba,as.png=as.png,output.dir=output.dir,verbose=verbose) # catch.metric
   jbplot_catcherror(jabba,as.png=as.png,output.dir=output.dir,verbose=verbose) 
@@ -1383,7 +1474,10 @@ jabba_plots = function(jabba,output.dir = getwd(),as.png=TRUE,statusplot ="kobe"
   jbplot_summary(jabba,as.png,output.dir=output.dir)
   
   if(statusplot =="kobe"){
-    jbplot_kobe(jabba,as.png=as.png,output.dir=output.dir,verbose=verbose)} else {
+    jbplot_kobe(jabba,as.png=as.png,output.dir=output.dir,verbose=verbose)
+    } else if(statusplot == "bfrac"){
+      jbplot_kobe_bfrac(jabba,as.png=as.png, output.dir=output.dir, verbose=verbose, bfrac = bfrac)
+      }else{
       jbplot_biplot(jabba,as.png=as.png,output.dir=output.dir,verbose=verbose)}
 }
 
@@ -2040,4 +2134,82 @@ jbplot_PPC <- function(jabba,joint.ppc=FALSE,thin.plot = TRUE ,output.dir=getwd(
 } # End of CPUE plot function
 
 
+#' Kobe plot using MSST, PIFSC version
+#' 
+#' @param jabba output list from fit_jabba
+#' @param output.dir directory to save plots
+#' @param ylab yaxis label
+#' @param xlab xaxis label
+#' @param as.png save as png file of TRUE
+#' @param add if true don't call par() to allow construction of multiplots
+#' @param width plot width
+#' @param height plot height
+#' @param verbose silent option
+#' @export
+jbplot_kobe <-  function(jabba ,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=FALSE,add=FALSE,width=5,height=4.5,verbose=TRUE){
 
+  if(verbose) cat(paste0("\n","><> jbplot_kobe() - Stock Status Plot  <><","\n"))
+
+  mu.f = jabba$timeseries[,,"FFmsy"]
+  mu.b = jabba$timeseries[,,"BBmsy"]
+  f = jabba$kobe$harvest
+  b = jabba$kobe$stock
+  years=jabba$yr
+  N = length(years)
+  # fit kernel function
+  kernelF <- gplots::ci2d(b,f,nbins=151,factor=1.5,ci.levels=c(0.50,0.80,0.75,0.90,0.95),show="none",col=1,xlab= ifelse(jabba$settings$harvest.label=="Fmsy",expression(paste(F/F[MSY])),expression(paste(H/H[MSY]))),ylab=expression(paste(B/B[MSY])))
+
+  Par = list(mfrow=c(1,1),mar = c(3.5, 3.5, 0.1, 0.1), mgp =c(2.,0.5,0), tck = -0.02,cex=0.8)
+  if(as.png==TRUE){ png(file = paste0(output.dir,"/Kobe_",jabba$assessment,"_",jabba$scenario,".png"), width = width, height = height,
+      res = 200, units = "in")}
+  if(add==FALSE) par(Par)
+
+  #Create plot
+  if(is.null(ylab)) ylab=ifelse(jabba$settings$harvest.label=="Fmsy",expression(paste(F/F[MSY])),expression(paste(H/H[MSY])))
+  if(is.null(xlab)) xlab=expression(paste(B/B[MSY]))
+  
+  plot(1000,1000,type="b", xlim=c(0,max(1/(jabba$refpts$bmsy/jabba$refpts$k)[1],mu.b[,1]) +0.05), ylim=c(0,max(mu.f[,1],quantile(f,0.85),2.)),lty=3,ylab=ylab,xlab=xlab,xaxs="i",yaxs="i")
+  c1 <- c(-1,100)
+  c2 <- c(1,1)
+
+  # extract interval information from ci2d object
+  # and fill areas using the polygon function
+  zb2 = c(0,1)
+  zf2  = c(1,100)
+  zb1 = c(1,100)
+  zf1  = c(0,1)
+  polygon(c(zb1,rev(zb1)),c(0,0,1,1),col="green",border=0)
+  polygon(c(zb2,rev(zb2)),c(0,0,1,1),col="yellow",border=0)
+  polygon(c(1,100,100,1),c(1,1,100,100),col="orange",border=0)
+  polygon(c(0,1,1,0),c(1,1,100,100),col="red",border=0)
+
+  polygon(kernelF$contours$"0.95",lty=2,border=NA,col="cornsilk4")
+  polygon(kernelF$contours$"0.8",border=NA,lty=2,col="grey")
+  polygon(kernelF$contours$"0.5",border=NA,lty=2,col="cornsilk2")
+
+  points(mu.b[,1],mu.f[,1],pch=16,cex=1)
+  lines(c1,c2,lty=3,lwd=0.7)
+  lines(c2,c1,lty=3,lwd=0.7)
+  lines(mu.b[,1],mu.f[,1], lty=1,lwd=1.)
+  sel.yr = c(1,round(quantile(1:N,0.7),0),N)
+  points(mu.b[sel.yr,1],mu.f[sel.yr,1],col=
+           1,pch=c(22,21,24),bg="white",cex=1.9)
+
+  # Get Propability
+  Pr.green = sum(ifelse(b>1 & f<1,1,0))/length(b)*100
+  Pr.red = sum(ifelse(b<1 & f>1,1,0))/length(b)*100
+  Pr.yellow = sum(ifelse(b<1 & f<1,1,0))/length(b)*100
+  Pr.orange = sum(ifelse(b>1 & f>1,1,0))/length(b)*100
+
+
+
+  sel.years = c(years[sel.yr])
+  ## Add legend
+
+  legend('topright',
+         c(paste(sel.years),"50% C.I.","80% C.I.","95% C.I.",paste0(round(c(Pr.red,Pr.yellow,Pr.orange,Pr.green),1),"%")),
+         lty=c(1,1,1,rep(-1,8)),pch=c(22,21,24,rep(22,8)),pt.bg=c(rep("white",3),"cornsilk2","grey","cornsilk4","red","yellow","orange","green"),
+         col=1,lwd=1.1,cex=0.9,pt.cex=c(rep(1.3,3),rep(1.7,3),rep(2.2,4)),bty="n")
+
+  if(as.png==TRUE){dev.off()}
+} # End of Kobe plot

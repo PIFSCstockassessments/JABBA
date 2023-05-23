@@ -105,7 +105,7 @@ if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 
       tau2[i] <- 1/itau2[i]
       }
 
-      for(i in 1:(nI-1)) #JS added -1
+      for(i in 1:(nI-1)) #JS added -1 #MO changed from nI-1
       {
       for(t in 1:N)
       {
@@ -125,7 +125,7 @@ if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 
            tau2[i] <- 1/itau2[i]
            }
 
-           for(i in 1:(nI-1))
+           for(i in 1:(nI-1)) #MO changed from nI-1
            {
            for(t in 1:N)
            {
