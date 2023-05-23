@@ -95,16 +95,26 @@ fit_jabba = function(jbinput,
   qbound = jbinput$jagsdata$q_bounds
   
   # Initial starting values (new Eq)
-  if(init.values==FALSE & length(grep("absolute", jbinput$settings$index_type)) > 0){
-    inits = function(){list(K= rlnorm(1,log(jbd$K.pr[1])-0.5*0.3^2,0.3),r = rlnorm(1,log(jbd$r.pr[1]),jbd$r.pr[2]) ,
-                           # q = pmin(pmax(qbound[1]*1.05,runif(jbd$nq,min(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T),mean(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T))),qbound[2]*0.95), #[1],NA), #JS added [1] and concat NA here
-                            q = c(runif(jbd$nq-1,0.005,0.5),NA), #JS attempt
-                            psi=rbeta(1,ab[1],ab[2]),isigma2.est=runif(1,20,100), itau2=runif(jbd$nvar,80,200),rad = runif(1, 10, 60))}   #JS added nvar-1 #MO removed
+  if(init.values==FALSE & !is.null(jbinput$jagsdata$rad.pr)){
+    inits = function(){
+      list(K= rlnorm(1,log(jbd$K.pr[1])-0.5*0.3^2,0.3),
+           r = rlnorm(1,log(jbd$r.pr[1]),jbd$r.pr[2]) ,
+         # q = pmin(pmax(qbound[1]*1.05,runif(jbd$nq,min(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T),mean(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T))),qbound[2]*0.95), #[1],NA), #JS added [1] and concat NA here
+           q = c(runif(jbd$nran.q,0.005,0.5),rep(NA, jbd$nq-jbd$nran.q)), #MO added
+           psi=rbeta(1,ab[1],ab[2]),
+         isigma2.est=runif(1,20,100), 
+         itau2=runif(jbd$nvar,80,200),
+         rad = runif(1, 10, 60))
+      }
   } else if(init.values==FALSE){
-    inits = function(){list(K= rlnorm(1,log(jbd$K.pr[1])-0.5*0.3^2,0.3),r = rlnorm(1,log(jbd$r.pr[1]),jbd$r.pr[2]) ,
-                           # q = pmin(pmax(qbound[1]*1.05,runif(jbd$nq,min(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T),mean(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T))),qbound[2]*0.95), #[1],NA), #JS added [1] and concat NA here
-                            q = c(runif(jbd$nq,0.005,0.5),NA), #JS attempt
-                            psi=rbeta(1,ab[1],ab[2]),isigma2.est=runif(1,20,100), itau2=runif(jbd$nvar,80,200),rad = runif(1, 10, 60))}   #JS added nvar-1 #MO removed
+    inits = function(){
+      list(K= rlnorm(1,log(jbd$K.pr[1])-0.5*0.3^2,0.3),
+           r = rlnorm(1,log(jbd$r.pr[1]),jbd$r.pr[2]) ,
+           q = c(runif(jbd$nq,0.005,0.5)), 
+           psi=rbeta(1,ab[1],ab[2]),
+           isigma2.est=runif(1,20,100), 
+           itau2=runif(jbd$nvar,80,200))
+      }   
   }else {
     
     if(is.null(init.K))
@@ -115,7 +125,13 @@ fit_jabba = function(jbinput,
       stop("\n","\n","><> Provide init.q vector guess for option init.values=TRUE  <><","\n","\n")
     if(length(init.q)!= jbinput$jagsdata$nq)
       stop("\n","\n","><> init.q vector must match length of estimable q's, length(unique(sets.q))   <><","\n","\n")
-    inits = function(){ list(K= init.K,r=init.r,q = init.q,psi=rbeta(1,ab[1],ab[2]), isigma2.est=runif(1,20,100), itau2=runif(jbd$nvar,80,200))}
+    inits = function(){ 
+      list(K= init.K,
+           r=init.r,
+           q = init.q,
+           psi=rbeta(1,ab[1],ab[2]), 
+           isigma2.est=runif(1,20,100), 
+           itau2=runif(jbd$nvar,80,200))}
   }
   
   
@@ -161,7 +177,7 @@ fit_jabba = function(jbinput,
   scenario = settings$scenario
   CPUE = settings$I
   if(settings$Auxiliary) AUXI = settings$A
-  n.indices = settings$nI
+  n.indices = settings$nvar
   
   
   # if run with library(rjags)
@@ -288,7 +304,7 @@ fit_jabba = function(jbinput,
     StResid = NULL
     
     if(settings$CatchOnly==FALSE){
-    for(i in 1:(n.indices-1)){   #JS added -1
+    for(i in 1:(n.indices)){   #JS added -1 ## MO removed n.indices is now nvar
       Resids =rbind(Resids,log(CPUE[,i])-log(apply(posteriors$CPUE[,,i],2,quantile,c(0.5))))
     
       StResid =rbind(StResid,log(CPUE[,i]/apply(posteriors$CPUE[,,i],2,quantile,c(0.5)))/
@@ -325,7 +341,7 @@ fit_jabba = function(jbinput,
       Yr = min(Yr):max(Yr)
       yr = Yr-min(years)+1
     
-    for(i in 1:(n.indices-1)){   #JS added -1
+    for(i in 1:(n.indices)){   #JS added -1 ##MO removed, n.indices is now = nvar
       exp.i = apply(posteriors$CPUE[,,i],2,quantile,c(0.5))[is.na(cpue[,i+1])==F]
       se.i = apply(posteriors$CPUE[,,i],2,sd)[is.na(cpue[,i+1])==F]
       expLCI.i = apply(posteriors$Ihat[,,i],2,quantile,c(0.025))[is.na(cpue[,i+1])==F]
@@ -391,16 +407,16 @@ fit_jabba = function(jbinput,
   #----------------------------------
   # Predicted CPUE
   #----------------------------------
-  cpue.hat = array(data=NA,dim=c(N,5,n.indices),list(years,c("mu","lci","uci","se","obserror"),names(cpue[,-1])))
-  for(i in 1:(n.indices-1)){  #JS added -1 
+  cpue.hat = array(data=NA,dim=c(N,5,n.indices),list(years,c("mu","lci","uci","se","obserror"),names(cpue[,-1][1:n.indices])))
+  for(i in 1:(n.indices)){  #JS added -1 
     cpue.hat[,,i] = cbind(t(apply(posteriors$Ihat[,,i],2,quantile,c(0.5,0.025,0.975))),apply(log(posteriors$Ihat[,,i]),2,sd),(apply(posteriors$TOE[,,i],2,quantile,c(0.5))))
   }
   #------------------------------------
   # Posterior Predictive Distribution
   #------------------------------------
   
-  cpue.ppd = array(data=NA,dim=c(N,5,n.indices),list(years,c("mu","lci","uci","se","obserror"),names(cpue[,-1])))
-  for(i in 1:(n.indices-1)){ #JS added -1
+  cpue.ppd = array(data=NA,dim=c(N,5,n.indices),list(years,c("mu","lci","uci","se","obserror"),names(cpue[,-1][1:n.indices])))
+  for(i in 1:(n.indices)){ #JS added -1
     cpue.ppd[,,i] = cbind(t(apply(posteriors$CPUE[,,i],2,quantile,c(0.5,0.025,0.975))),apply(log(posteriors$CPUE[,,i]),2,sd),(apply(posteriors$TOE[,,i],2,quantile,c(0.5))))
   }
 }

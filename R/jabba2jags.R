@@ -15,8 +15,9 @@ jabba2jags = function(jbinput, dir){
     # Prior specifications
     eps <- 0.0000000000000000000000000000000001 # small constant")
 
-if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 1){
-  cat("
+if ("index_type" %in% names(jbinput$settings) & length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 ){
+  if(jbinput$settings$nran.q == 1){
+    cat("
   #Camera effective radius prior
     rad ~ dlnorm(rad.pr[1], pow(rad.pr[2],-2))T(7.5,60.6)
 
@@ -24,10 +25,9 @@ if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 
     q[2] <- a.grid/(rad*rad*3.14159) 
 
   ", append = TRUE)
-
-} else if(length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 2){
-
-  cat("
+  }
+  if(jbinput$settings$nran.q == 2){
+cat("
    #Camera effective radius prior
     rad ~ dlnorm(rad.pr[1], pow(rad.pr[2],-2))T(7.5,60.6)
 
@@ -36,6 +36,7 @@ if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 
     q[3] <- a.grid/(rad*rad*3.14159) 
   
   ", append = TRUE)
+  }
 
 } else{
     cat("
@@ -105,7 +106,7 @@ if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 
       tau2[i] <- 1/itau2[i]
       }
 
-      for(i in 1:(nI-1)) #JS added -1 #MO changed from nI-1
+      for(i in 1:(nvar)) #JS added -1 #MO changed from nI-1
       {
       for(t in 1:N)
       {
@@ -125,7 +126,7 @@ if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 
            tau2[i] <- 1/itau2[i]
            }
 
-           for(i in 1:(nI-1)) #MO changed from nI-1
+           for(i in 1:(nvar)) #MO changed from nI-1
            {
            for(t in 1:N)
            {
