@@ -168,6 +168,7 @@ It will be separated from default name by an underscore.}
 Plots plots JABBA ensemble models + projections - joint or by run
 }
 \examples{
+\dontrun{
 data(iccat)
 bet = iccat$bet 
 # Fit Fox and Schaefer
@@ -184,6 +185,7 @@ prj = fw_jabba(list(fit1),quant="Catch",type="abs",imp.values = seq(60,100,1)*10
 jbplot_ensemble(prj)
 # Zoom in
 jbplot_ensemble(prj,xlim=c(2000,2027))
+}
 }
 \author{
 Mostly adopted from ss3diags::SSplotEnsemble
