@@ -548,8 +548,11 @@ if(!is.null(rad.prior)){
   jbinput$settings$assessment = assessment
   jbinput$settings$scenario = scenario
   jbinput$settings$cols = jabba.colors
-  jbinput$settings$index_type = index_type
-  jbinput$settings$nran.q = nran.q
+  if(!is.null(index_type)){
+      jbinput$settings$index_type = index_type
+      jbinput$settings$nran.q = nran.q
+  }
+
   
   #capture.output(jbinput, file=paste0(output.dir,"/Settings.txt"))
   #-------------------------------------------------------------------
