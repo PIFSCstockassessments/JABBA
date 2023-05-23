@@ -26,6 +26,7 @@
 #' @param rad.prior default NULL, if including radius prior: c(target_rad_mean,CV_rad),  
 #' @param n.grid NULL, number of sampling grids in a domain
 #' @param a.grid NULL, area within a sampling grid
+#' @param s_lambda NULL, for uncertainty with BFISH survey
 #' @param b.prior = c(FALSE,0.3,NA,c("bk","bbmy","ffmsy")[1]), # depletion prior set as d.prior = c(mean,cv,yr,type=c("bk","bbmsy"))
 #' @param BmsyK = 0.4, # Inflection point of the surplus production curve, requires Pella-Tomlinson (model = 3 | model 4)
 #' @param shape.CV = 0.3, # CV of the shape m parameters, if estimated with Pella-Tomlinson (Model 4)
@@ -81,6 +82,7 @@ build_jabba <- function(
   rad.prior = NULL, #c(target_rad_mean,CV_rad),  only specify if index_type has an absolute type
   n.grid = NULL,
   a.grid = NULL,
+  s_lambda = NULL,
   b.prior = c(FALSE,0.3,NA,c("bk","bbmsy","ffmsy")[1]), # depletion prior set as b.prior = c(mean,cv,yr,type=c("bk","bbmsy","ffmsy))
   BmsyK = 0.4, # Inflection point of the surplus production curve, requires Pella-Tomlinson (model = 3 | model 4)
   shape.CV = 0.3, # CV of the shape m parameters, if estimated with Pella-Tomlinson (Model 4)
@@ -463,7 +465,7 @@ if(!is.null(rad.prior)){
   if(!is.null(rad.prior)){
     surplus.dat = list(N=n.years, TC = TC,I=CPUE,SE2=se2,r.pr=r.pr,psi.pr=psi.pr,K.pr = K.pr,
                      rad.pr=rad.pr,n.grid=n.grid,a.grid=a.grid, #rel.ind =rel.ind,
-                     s_lambda=s_lambda,
+                     s_lambda=s_lambda, nran.q = nran.q,
                      nq=nq,nI = nI,nvar=nvar,sigma.fixed=ifelse(sigma.proc==TRUE,0,sigma.proc),
                      sets.var=sets.var, sets.q=sets.q,Plim=Plim,slope.HS=slope.HS,
                      nTAC=nTAC,pyrs=pyrs,TAC=TAC,igamma = igamma,stI=stI,pen.P = rep(0,n.years) ,pen.bk = rep(0,n.years),proc.pen=0,K.pen = 0,

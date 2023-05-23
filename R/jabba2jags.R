@@ -227,10 +227,12 @@ if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 
     ",append=TRUE)
 
   if(jbinput$settings$CatchOnly==FALSE){
-    cat("
-    # Observation equation in related to EB
+    if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0){
 
-    for(i in 1:(nI-1))
+     cat("
+     # Observation equation in related to EB
+
+    for(i in 1:nran.q)
     {
     for (t in 1:N)
     {
@@ -239,56 +241,130 @@ if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 
     CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
     Ihat[t,i]  <- exp(Imean[t,i])
 
-    }}
-
-
-     for(i in nI){ ## added for BFISH index
+    }}",append=TRUE)
+     if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 1){
+  cat("
+      ## added for BFISH index
       for (t in 68:N){ 
         
-        Imean[t,i] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
-        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,i]))  #( ivar.obs[t,i])
-        I[t, i] ~ dlnorm(Imean[t,i], survey_precision[t])
-        CPUE[t,i] <- P[t]*K/(q[sets.q[nq]]*n.grid)
-        Ihat[t,i]  <- exp(Imean[t,i])
+        Imean[t,2] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,2]))  #( ivar.obs[t,2])
+        I[t, 2] ~ dlnorm(Imean[t,2], survey_precision[t])
+        CPUE[t,2] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+        Ihat[t,2]  <- exp(Imean[t,2])
 
         }
-        }
 
-  ",append=TRUE)}
-  
-    if(jbinput$settings$CatchOnly==TRUE){
+  ",append=TRUE)
+  }else if(length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 2){
       cat("
+      
+      ## added for BFISH index
+      for (t in 68:N){ 
+        
+        Imean[t,3] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,3]))  #( ivar.obs[t,3])
+        I[t, 3] ~ dlnorm(Imean[t,3], survey_precision[t])
+        CPUE[t,3] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+        Ihat[t,3]  <- exp(Imean[t,3])
+
+        }
+      
+      ",append=TRUE)}
+
+  }else{
+    cat("
     # Observation equation in related to EB
-    one <- sets.q
-    for(i in 1:(nI-1))
+
+    for(i in 1:(nI))
     {
     for (t in 1:N)
     {
-    Imean[t,i] <- log(pow(P[1],-1)*P[t]);
+    Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
     I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
     CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
     Ihat[t,i]  <- exp(Imean[t,i])
 
-    }}
+    }}",append=TRUE)
 
-    for(i in nI){ ## added for BFISH index
-      for (t in 68:N){ 
-        
-        Imean[t,i] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
-        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,i]))  #( ivar.obs[t,i])
-        I[t, i] ~ dlnorm(Imean[t,i], survey_precision[t])
-        CPUE[t,i] <- P[t]*K/(q[sets.q[nq]]*n.grid)
-        Ihat[t,i]  <- exp(Imean[t,i])
+  }
+
+    }
+  
+    if(jbinput$settings$CatchOnly==TRUE){
+
+      if(length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0){
+        cat("
+            # Observation equation in related to EB
+              one <- sets.q
+              for(i in 1:(nran.q))
+              {
+              for (t in 1:N)
+              {
+              Imean[t,i] <- log(pow(P[1],-1)*P[t]);
+              I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
+              CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
+              Ihat[t,i]  <- exp(Imean[t,i])
+
+              }}
+        ",append=TRUE)
+
+        if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 1){
+
+          cat("
+          ## added for BFISH index
+              for (t in 68:N){ 
+              
+              Imean[t,2] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+              survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,2]))  #( ivar.obs[t,2])
+              I[t, 2] ~ dlnorm(Imean[t,2], survey_precision[t])
+              CPUE[t,2] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+              Ihat[t,2]  <- exp(Imean[t,2])
+
+              }
+          
+          ",append=TRUE)
+
+
+        }else if(length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 2){
+
+          cat("
+             ## added for BFISH index
+              for (t in 68:N){ 
+              
+              Imean[t,3] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+              survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,3]))  #( ivar.obs[t,3])
+              I[t, 3] ~ dlnorm(Imean[t,3], survey_precision[t])
+              CPUE[t,3] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+              Ihat[t,3]  <- exp(Imean[t,3])
+
+              }
+          
+          ",append=TRUE)
+
 
         }
-        }
+      }else{
+          cat("
+           # Observation equation in related to EB
+            one <- sets.q
+            for(i in 1:(nI))
+            {
+            for (t in 1:N)
+            {
+            Imean[t,i] <- log(pow(P[1],-1)*P[t]);
+            I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
+            CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
+            Ihat[t,i]  <- exp(Imean[t,i])
 
-  ",append=TRUE)} 
+            }}
+          
+          ",append=TRUE)
+      }
+} 
     
   cat("
       
-    
-   
     # Enforce soft penalty on K if < K_bounds >
     K.pen ~ dnorm(penK,1000) # enforce penalty
     penK  <- ifelse(K<(K_bounds[1]),log(K)-log(K_bounds[1]),ifelse(K>K_bounds[2],log(K)-log(K_bounds[2]),0)) # penalty if Pmean is outside viable biomass
