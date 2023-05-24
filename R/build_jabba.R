@@ -22,6 +22,11 @@
 #' @param K.prior = NULL, # prior(mu,CV) for the unfished biomass K = B0
 #' @param psi.dist = c("lnorm","beta"), # prior distribution for the initial biomass depletion B[1]/K
 #' @param psi.prior = c(0.9,0.25), # prior(mu, CV) for the initial biomass depletion B[1]/K
+#' @param index_type default NULL, use "absolute" for surveys of absolute abundance estimates (eg BFISH older version) or "relative" for surveys of relative abundance, vector length of ncol(cpue)-1
+#' @param rad.prior default NULL, if including radius prior: c(target_rad_mean,CV_rad),  
+#' @param n.grid NULL, number of sampling grids in a domain
+#' @param a.grid NULL, area within a sampling grid
+#' @param s_lambda NULL, for uncertainty with BFISH survey
 #' @param b.prior = c(FALSE,0.3,NA,c("bk","bbmy","ffmsy")[1]), # depletion prior set as d.prior = c(mean,cv,yr,type=c("bk","bbmsy"))
 #' @param BmsyK = 0.4, # Inflection point of the surplus production curve, requires Pella-Tomlinson (model = 3 | model 4)
 #' @param shape.CV = 0.3, # CV of the shape m parameters, if estimated with Pella-Tomlinson (Model 4)
@@ -73,6 +78,11 @@ build_jabba <- function(
   K.prior = NULL, # prior(mu,CV) for the unfished biomass K = B0
   psi.dist = c("lnorm","beta"), # prior distribution for the initial biomass depletion B[1]/K
   psi.prior = c(0.9,0.25), # depletionprior(mu, CV) for the initial biomass depletion B[1]/K
+  index_type = NULL, #default is NULL
+  rad.prior = NULL, #c(target_rad_mean,CV_rad),  only specify if index_type has an absolute type
+  n.grid = NULL,
+  a.grid = NULL,
+  s_lambda = NULL,
   b.prior = c(FALSE,0.3,NA,c("bk","bbmsy","ffmsy")[1]), # depletion prior set as b.prior = c(mean,cv,yr,type=c("bk","bbmsy","ffmsy))
   BmsyK = 0.4, # Inflection point of the surplus production curve, requires Pella-Tomlinson (model = 3 | model 4)
   shape.CV = 0.3, # CV of the shape m parameters, if estimated with Pella-Tomlinson (Model 4)
@@ -333,9 +343,18 @@ build_jabba <- function(
     log.K = log(K.prior[1])#-0.5*sd.K^2
   }
   
-  
-  
-  
+  #JS added radius prior
+#----------------------------------------------------
+# Prepare radius prior
+#----------------------------------------------------
+
+if(!is.null(rad.prior)){
+  log.rad = log(rad.prior[1])
+  CV.rad = rad.prior[2] 
+  sd.rad = sqrt(log(CV.rad^2+1))
+  rad.pr = plot_lnorm(mu = log.rad, CV.rad, Prior = "Radius")
+}
+
   # Get input priors
   K.pr = plot_lnorm(exp(log.K),CV.K,Prior="K")
   r.pr = plot_lnorm(mu=exp(log.r),CV=CV.r,Prior="r")
@@ -353,12 +372,17 @@ build_jabba <- function(
   
   
   # Note PRIORS and save input subfolder
-  Priors =rbind(c(K.pr[1],CV.K),psi.prior,c(r.pr[1],CV.r))
-  row.names(Priors) = c("K","Psi","r")
+  if(!is.null(rad.prior)){
+    Priors =rbind(c(K.pr[1],CV.K),psi.prior,c(r.pr[1],CV.r),c(rad.pr[1],CV.rad)) #JS added rad
+    row.names(Priors) = c("K","Psi","r", "Rad")
+  }else{
+    Priors =rbind(c(K.pr[1],CV.K),psi.prior,c(r.pr[1],CV.r))
+    row.names(Priors) = c("K","Psi","r")
+  }
+  
   colnames(Priors) = c("Mean","CV")
   Priors = data.frame(Priors)
   Priors$log.sd = sqrt(log(Priors[,2]^2+1))
-  
   
   if(verbose) {
     message("\n","><> Model type:",model.type," <><","\n")
@@ -423,23 +447,39 @@ build_jabba <- function(
   nSel = 1 # setup for JABBA-SELECT version (in prep)
   nI = ncol(CPUE) # number of CPUE series
   stI = ifelse(proc.dev.all==TRUE,1, c(1:n.years)[is.na(apply(CPUE,1,mean,na.rm=TRUE))==FALSE][1]) #first year with CPUE
-  
-  # starting values
-  nq = length(unique(sets.q))
   nvar = length(unique(sets.var))
+  # starting values
+  
+ if(!is.null(index_type)){
+
+    abs.ind <- grep("absolute", index_type, ignore.case = TRUE)
+    #ind_type <- ifelse(grep("absolute", index_type, ignore.case = TRUE), 1, 0)
+    nran.q = length(unique(sets.q[-abs.ind]))
+    #rel.ind <- grep("relative", index_type, ignore.case = TRUE)
+    nq = length(unique(sets.q))
+  }else{
+    nq = length(unique(sets.q)) #JS subtract 1?
+  }
   
   
   # JABBA input data
-  surplus.dat = list(N=n.years, TC = TC,I=CPUE,SE2=se2,r.pr=r.pr,psi.pr=psi.pr,K.pr = K.pr,
+  if(!is.null(rad.prior)){
+    surplus.dat = list(N=n.years, TC = TC,I=CPUE,SE2=se2,r.pr=r.pr,psi.pr=psi.pr,K.pr = K.pr,
+                     rad.pr=rad.pr,n.grid=n.grid,a.grid=a.grid, #rel.ind =rel.ind,
+                     s_lambda=s_lambda, nran.q = nran.q,
+                     nq=nq,nvar=nvar,sigma.fixed=ifelse(sigma.proc==TRUE,0,sigma.proc),
+                     sets.var=sets.var, sets.q=sets.q,Plim=Plim,slope.HS=slope.HS,
+                     nTAC=nTAC,pyrs=pyrs,TAC=TAC,igamma = igamma,stI=stI,pen.P = rep(0,n.years) ,pen.bk = rep(0,n.years),proc.pen=0,K.pen = 0,
+                     obs.pen = rep(0,nvar),P_bound=P_bound,q_bounds=q_bounds,sigmaobs_bound=sigmaobs_bound,sigmaproc_bound=sigmaproc_bound,K_bounds=K_bounds,mu.m=m,b.yr=b.yr, b.pr = b.pr)
+                     params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","Overfishing_ind","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","prOverfishing_ind","TOE", "rad")
+  }else{
+    surplus.dat = list(N=n.years, TC = TC,I=CPUE,SE2=se2,r.pr=r.pr,psi.pr=psi.pr,K.pr = K.pr,
                      nq=nq,nI = nI,nvar=nvar,sigma.fixed=ifelse(sigma.proc==TRUE,0,sigma.proc),
                      sets.var=sets.var, sets.q=sets.q,Plim=Plim,slope.HS=slope.HS,
                      nTAC=nTAC,pyrs=pyrs,TAC=TAC,igamma = igamma,stI=stI,pen.P = rep(0,n.years) ,pen.bk = rep(0,n.years),proc.pen=0,K.pen = 0,
                      obs.pen = rep(0,nvar),P_bound=P_bound,q_bounds=q_bounds,sigmaobs_bound=sigmaobs_bound,sigmaproc_bound=sigmaproc_bound,K_bounds=K_bounds,mu.m=m,b.yr=b.yr, b.pr = b.pr)
-  
-  
-  
-  # PARAMETERS TO MONITOR
-  params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","TOE")
+    params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","Overfishing_ind","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","prOverfishing_ind","TOE")
+  }
   
   
   #-----------------------------------------------
@@ -509,6 +549,12 @@ build_jabba <- function(
   jbinput$settings$assessment = assessment
   jbinput$settings$scenario = scenario
   jbinput$settings$cols = jabba.colors
+  if(!is.null(index_type)){
+      jbinput$settings$index_type = index_type
+      jbinput$settings$nran.q = nran.q
+  }
+
+  
   #capture.output(jbinput, file=paste0(output.dir,"/Settings.txt"))
   #-------------------------------------------------------------------
   # write JAGS MODEL

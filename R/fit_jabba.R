@@ -25,10 +25,12 @@
 #' @return A result list containing estimates of model input, settings and results
 #' @export
 #' @examples
+#' \dontrun{
 #' data(iccat)
 #' jbinput <- build_jabba(catch=iccat$bet$catch,cpue=iccat$bet$cpue,se=iccat$bet$se,model.type="Fox")
 #' bet1 = fit_jabba(jbinput,quickmcmc=TRUE,verbose=TRUE)
 #' jbplot_summary(bet1)
+#' }
 
 fit_jabba = function(jbinput,
                      # MCMC settings
@@ -93,10 +95,27 @@ fit_jabba = function(jbinput,
   qbound = jbinput$jagsdata$q_bounds
   
   # Initial starting values (new Eq)
-  if(init.values==FALSE){
-    inits = function(){list(K= rlnorm(1,log(jbd$K.pr[1])-0.5*0.3^2,0.3),r = rlnorm(1,log(jbd$r.pr[1]),jbd$r.pr[2]) ,
-                            q = pmin(pmax(qbound[1]*1.05,runif(jbd$nq,min(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T),mean(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T))),qbound[2]*0.95)
-                            ,psi=rbeta(1,ab[1],ab[2]),isigma2.est=runif(1,20,100), itau2=runif(jbd$nvar,80,200))}
+  if(init.values==FALSE & !is.null(jbinput$jagsdata$rad.pr)){
+    inits = function(){
+      list(K= rlnorm(1,log(jbd$K.pr[1])-0.5*0.3^2,0.3),
+           r = rlnorm(1,log(jbd$r.pr[1]),jbd$r.pr[2]) ,
+         # q = pmin(pmax(qbound[1]*1.05,runif(jbd$nq,min(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T),mean(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T))),qbound[2]*0.95), #[1],NA), #JS added [1] and concat NA here
+           q = c(runif(jbd$nran.q,10e-10,10),rep(NA, jbd$nq-jbd$nran.q)), #MO added
+           psi=rbeta(1,ab[1],ab[2]),
+         isigma2.est=runif(1,20,100), 
+         itau2=runif(jbd$nvar,80,200),
+         rad = runif(1, 10, 60))
+      }
+  } else if(init.values==FALSE){
+    inits = function(){
+      list(K= rlnorm(1,log(jbd$K.pr[1])-0.5*0.3^2,0.3),
+           r = rlnorm(1,log(jbd$r.pr[1]),jbd$r.pr[2]) ,
+           q = runif(jbd$nq,10e-10,10),
+           #q = pmin(pmax(qbound[1]*1.05,runif(jbd$nq,min(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T),mean(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T))),qbound[2]*0.95), 
+           psi=rbeta(1,ab[1],ab[2]),
+           isigma2.est=runif(1,20,100), 
+           itau2=runif(jbd$nvar,80,200))
+      }   
   }else {
     
     if(is.null(init.K))
@@ -107,7 +126,13 @@ fit_jabba = function(jbinput,
       stop("\n","\n","><> Provide init.q vector guess for option init.values=TRUE  <><","\n","\n")
     if(length(init.q)!= jbinput$jagsdata$nq)
       stop("\n","\n","><> init.q vector must match length of estimable q's, length(unique(sets.q))   <><","\n","\n")
-    inits = function(){ list(K= init.K,r=init.r,q = init.q,psi=rbeta(1,ab[1],ab[2]), isigma2.est=runif(1,20,100), itau2=runif(jbd$nvar,80,200))}
+    inits = function(){ 
+      list(K= init.K,
+           r=init.r,
+           q = init.q,
+           psi=rbeta(1,ab[1],ab[2]), 
+           isigma2.est=runif(1,20,100), 
+           itau2=runif(jbd$nvar,80,200))}
   }
   
   
@@ -153,7 +178,7 @@ fit_jabba = function(jbinput,
   scenario = settings$scenario
   CPUE = settings$I
   if(settings$Auxiliary) AUXI = settings$A
-  n.indices = settings$nI
+  n.indices = settings$nvar
   
   
   # if run with library(rjags)
@@ -168,7 +193,12 @@ fit_jabba = function(jbinput,
   #-----------------------------------------------------------
   
   # run some mcmc convergence tests
-  par.dat= data.frame(posteriors[params[c(1:7)]])
+  if(length(grep("rad", params)) > 0){
+    par.dat= data.frame(posteriors[params[c(1:7,25)]]) #25 for rad
+  }else{
+    par.dat= data.frame(posteriors[params[c(1:7)]]) 
+  }
+  
   
   geweke = coda::geweke.diag(data.frame(par.dat))
   pvalues <- 2*pnorm(-abs(geweke$z))
@@ -185,18 +215,20 @@ fit_jabba = function(jbinput,
   
   # Current stock status (Kobe posterior)
   H_Hmsy.cur = posteriors$HtoHmsy[,c(n.years)]
+  Overfishing.cur = posteriors$Overfishing_ind[,c(n.years)]
   B_Bmsy.cur = posteriors$BtoBmsy[,c(n.years)]
   
   
   # Prepare posterior quantaties
-  man.dat = data.frame(man.dat,Depletion,B_Bmsy.cur,H_Hmsy.cur)
+  man.dat = data.frame(man.dat,Depletion,B_Bmsy.cur,H_Hmsy.cur, Overfishing.cur)
   
   results = t(cbind(apply(par.dat,2,quantile,c(0.025,0.5,0.975)))) 
   
   results = data.frame(Median = results[,2],LCI=results[,1],UCI=results[,3],Geweke.p=round(pvalues,3),Heidel.p = round(heidle[,3],3))
-  
+  #JS added Overfishing ref point below, need to check dims
+  #ref.points = round(t(cbind(apply(man.dat[,1:4],2,quantile,c(0.025,0.5,0.975)),sum(man.dat[,5])/dim(man.dat)[2])),3)
   ref.points = round(t(cbind(apply(man.dat,2,quantile,c(0.025,0.5,0.975)))),3)
-  
+ 
   ref.points = data.frame(Median = ref.points[,2],LCI=ref.points[,1],UCI=ref.points[,3])
   # get number of parameters
   npar = length(par.dat)
@@ -222,14 +254,15 @@ fit_jabba = function(jbinput,
   #Ht_Hmsy = posteriors$HtoHmsy
   #Bt_K = posteriors$P
   catch.temp = matrix(rep(catch[,2],each=nrow(posteriors$SB)),ncol=nrow(jbinput$data$catch),nrow=nrow(posteriors$SB))
-  
+  #JS added Overfishing ref point below
   yrdim = length(years)
-  Stock_trj = array(data=NA,dim=c(yrdim,3,7),dimnames = list(years,c("mu","lci","uci"),c("B","F","BBmsy","FFmsy","BB0","procB","SPt")))
+  Stock_trj = array(data=NA,dim=c(yrdim,3,8),dimnames = list(years,c("mu","lci","uci"),c("B","F","BBmsy","FFmsy","Overfishing_ind","BB0","procB","SPt"))) 
   for(i in 1:3){
     Stock_trj[,i,] =  cbind(t(apply(posteriors$SB[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$H[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$BtoBmsy[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$HtoHmsy[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
+                            t(apply(posteriors$Overfishing_ind[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$P[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$Proc.Dev[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(cbind(rep(0,3),apply(posteriors$SB[,-1]-posteriors$SB[,-ncol(posteriors$SB)]+catch.temp[,-ncol(posteriors$SB)],2,quantile,c(0.5,0.025,0.975)))[,1:yrdim])[,i]
@@ -237,7 +270,14 @@ fit_jabba = function(jbinput,
     
   }
   
+  #JS - added pOFLH and pOFLB
   
+  OFLH<-ifelse(posteriors$Overfishing_ind>1,1,0)
+  pOFLH<-t(apply(OFLH[,1:yrdim],2,sum)/apply(OFLH[,1:yrdim],2,length))[,1:yrdim]
+  OFLB<-ifelse(posteriors$BtoBmsy<0.866,1,0)
+  pOFLB<-t(apply(OFLB[,1:yrdim],2,sum)/apply(OFLB[,1:yrdim],2,length))[,1:yrdim]
+
+  Stock_trj2<-cbind(Stock_trj[,1,],pOFLH,pOFLB)
   
   #------------------------
   # Production function
@@ -265,7 +305,7 @@ fit_jabba = function(jbinput,
     StResid = NULL
     
     if(settings$CatchOnly==FALSE){
-    for(i in 1:n.indices){
+    for(i in 1:(n.indices)){   #JS added -1 ## MO removed n.indices is now nvar
       Resids =rbind(Resids,log(CPUE[,i])-log(apply(posteriors$CPUE[,,i],2,quantile,c(0.5))))
     
       StResid =rbind(StResid,log(CPUE[,i]/apply(posteriors$CPUE[,,i],2,quantile,c(0.5)))/
@@ -302,7 +342,7 @@ fit_jabba = function(jbinput,
       Yr = min(Yr):max(Yr)
       yr = Yr-min(years)+1
     
-    for(i in 1:n.indices){
+    for(i in 1:(n.indices)){   #JS added -1 ##MO removed, n.indices is now = nvar
       exp.i = apply(posteriors$CPUE[,,i],2,quantile,c(0.5))[is.na(cpue[,i+1])==F]
       se.i = apply(posteriors$CPUE[,,i],2,sd)[is.na(cpue[,i+1])==F]
       expLCI.i = apply(posteriors$Ihat[,,i],2,quantile,c(0.025))[is.na(cpue[,i+1])==F]
@@ -368,16 +408,16 @@ fit_jabba = function(jbinput,
   #----------------------------------
   # Predicted CPUE
   #----------------------------------
-  cpue.hat = array(data=NA,dim=c(N,5,n.indices),list(years,c("mu","lci","uci","se","obserror"),names(cpue[,-1])))
-  for(i in 1:n.indices){
+  cpue.hat = array(data=NA,dim=c(N,5,n.indices),list(years,c("mu","lci","uci","se","obserror"),names(cpue[,-1][1:n.indices])))
+  for(i in 1:(n.indices)){  #JS added -1 
     cpue.hat[,,i] = cbind(t(apply(posteriors$Ihat[,,i],2,quantile,c(0.5,0.025,0.975))),apply(log(posteriors$Ihat[,,i]),2,sd),(apply(posteriors$TOE[,,i],2,quantile,c(0.5))))
   }
   #------------------------------------
   # Posterior Predictive Distribution
   #------------------------------------
   
-  cpue.ppd = array(data=NA,dim=c(N,5,n.indices),list(years,c("mu","lci","uci","se","obserror"),names(cpue[,-1])))
-  for(i in 1:n.indices){
+  cpue.ppd = array(data=NA,dim=c(N,5,n.indices),list(years,c("mu","lci","uci","se","obserror"),names(cpue[,-1][1:n.indices])))
+  for(i in 1:(n.indices)){ #JS added -1
     cpue.ppd[,,i] = cbind(t(apply(posteriors$CPUE[,,i],2,quantile,c(0.5,0.025,0.975))),apply(log(posteriors$CPUE[,,i]),2,sd),(apply(posteriors$TOE[,,i],2,quantile,c(0.5))))
   }
 }
@@ -389,7 +429,7 @@ fit_jabba = function(jbinput,
     # Predicted CPUE
     #----------------------------------
     cpue.hat = array(data=NA,dim=c(N,5,n.indices+nA),list(years,c("mu","lci","uci","se","obserror"),c(names(cpue)[-1],names(auxiliary)[-1])))
-    for(i in 1:n.indices){
+    for(i in 1:(n.indices-1)){ #JS added -1
       cpue.hat[,,i] = cbind(t(apply(posteriors$Ihat[,,i],2,quantile,c(0.5,0.025,0.975))),apply(log(posteriors$Ihat[,,i]),2,sd),(apply(posteriors$TOE[,,i],2,quantile,c(0.5))))
     }
     for(i in 1:nA){
@@ -400,7 +440,7 @@ fit_jabba = function(jbinput,
     #------------------------------------
     
     cpue.ppd = array(data=NA,dim=c(N,5,n.indices+nA),list(years,c("mu","lci","uci","se","obserror"),c(names(cpue)[-1],names(auxiliary)[-1])))
-    for(i in 1:n.indices){
+    for(i in 1:(n.indices-1)){ #JS added -1
       cpue.ppd[,,i] = cbind(t(apply(posteriors$CPUE[,,i],2,quantile,c(0.5,0.025,0.975))),apply(log(posteriors$CPUE[,,i]),2,sd),(apply(posteriors$TOE[,,i],2,quantile,c(0.5))))
     }
     for(i in 1:nA){
@@ -413,7 +453,12 @@ fit_jabba = function(jbinput,
   #-----------------------------------
   # Note posteriors of key parameters
   #-----------------------------------
-  sel.par = c(1,2,7,4,3,5)
+  if(length(grep("rad", params)) > 0){
+    sel.par = c(1,2,7,4,3,5,25) #MO added 25 - radius
+  }else{
+    sel.par = c(1,2,7,4,3,5) 
+  }
+  
   if(!settings$Auxiliary){
   out=data.frame(posteriors[params[sel.par]])
   } else {
@@ -540,7 +585,7 @@ fit_jabba = function(jbinput,
       kb.temp$run = paste0("C",TACs[j])
       for(i in 1:pyrs){
         kb.temp = rbind(kb.temp,data.frame(year=proj.yrs[i],run=paste0("C",TACs[j]),type="prj",iter=1:length(posteriors$K),
-                                           stock=posteriors$prBtoBmsy[,i,j],harvest=posteriors$prHtoHmsy[,i,j],B=posteriors$prBtoBmsy[,i,j]*posteriors$SBmsy,H=posteriors$prHtoHmsy[,i,j]*posteriors$Hmsy,
+                                           stock=posteriors$prBtoBmsy[,i,j],harvest=posteriors$prHtoHmsy[,i,j],Overfishing=posteriors$prOverfishing_ind[,i,j],B=posteriors$prBtoBmsy[,i,j]*posteriors$SBmsy,H=posteriors$prHtoHmsy[,i,j]*posteriors$Hmsy,
                                            Bdev=0,Catch= TACs[j],BB0=posteriors$prP[,i,j]))
       }
       
@@ -566,6 +611,8 @@ fit_jabba = function(jbinput,
     write.csv(data.frame(results),paste0(output.dir,"/Estimates_",settings$assessment,"_",settings$scenario,".csv"))
     write.csv(Table,paste0(output.dir,"/Results_",settings$assessment,"_",settings$scenario,".csv"))
     write.csv(jabba$stats,paste0(output.dir,"/GoodnessFit_",settings$assessment,"_",settings$scenario,".csv"))
+    write.csv( Stock_trj2,paste0(output.dir,"/Stock_trj2_",settings$assessment,"_",settings$scenario,".csv"))
+
   }
   
   

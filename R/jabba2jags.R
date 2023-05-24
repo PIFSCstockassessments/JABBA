@@ -13,14 +13,42 @@ jabba2jags = function(jbinput, dir){
     model {
 
     # Prior specifications
-    eps <- 0.0000000000000000000000000000000001 # small constant
+    eps <- 0.0000000000000000000000000000000001 # small constant")
 
-    #Catchability coefficients
+if ("index_type" %in% names(jbinput$settings) & length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 ){
+  if(jbinput$settings$nran.q == 1){
+    cat("
+  #Camera effective radius prior
+    rad ~ dlnorm(rad.pr[1], pow(rad.pr[2],-2))T(7.5,60.6)
+
+    q[1] ~ dunif(q_bounds[1], q_bounds[2])
+    q[2] <- a.grid/(rad*rad*3.14159) 
+
+  ", append = TRUE)
+  }
+  if(jbinput$settings$nran.q == 2){
+cat("
+   #Camera effective radius prior
+    rad ~ dlnorm(rad.pr[1], pow(rad.pr[2],-2))T(7.5,60.6)
+
+    q[1] ~ dunif(q_bounds[1], q_bounds[2])
+    q[2] ~ dunif(q_bounds[1], q_bounds[2])
+    q[3] <- a.grid/(rad*rad*3.14159) 
+  
+  ", append = TRUE)
+  }
+
+} else{
+    cat("
+    #Catchability coefficient
     for(i in 1:nq)
     {
-    q[i] ~ dunif(q_bounds[1],q_bounds[2])
+      q[i] ~ dunif(q_bounds[1], q_bounds[2])
     }
-
+    ", append = TRUE)
+}
+  
+  cat("
     # Process variance prior
     isigma2.est ~ dgamma(igamma[1],igamma[2])
 
@@ -30,7 +58,7 @@ jabba2jags = function(jbinput, dir){
     # informative priors for Hmsy as a function of r
     r ~ dlnorm(log(r.pr[1]),pow(r.pr[2],-2))
 
-    ")
+    ", append = TRUE)
   
   if(jbinput$settings$model.id==4){
     cat("
@@ -71,14 +99,14 @@ jabba2jags = function(jbinput, dir){
   if(jbinput$settings$sigma.est==TRUE){
     cat("
       # Observation variance
-      for(i in 1:nvar)
+      for(i in 1:(nvar))  #JS added -1 #MO removed
       {
       # Observation error
-      itau2[i]~ dgamma(0.001,0.001)
+      itau2[i]~ dgamma(0.2,0.1)   #These are (0.001,0.001) OR (0.2,0.1) in previous assessment
       tau2[i] <- 1/itau2[i]
       }
 
-      for(i in 1:nI)
+      for(i in 1:(nvar)) #JS added -1 #MO changed from nI-1
       {
       for(t in 1:N)
       {
@@ -91,14 +119,14 @@ jabba2jags = function(jbinput, dir){
       ",append=TRUE)
   }else{ cat("
       # Observation variance
-           for(i in 1:nvar)
+           for(i in 1:(nvar)) #MO removed
            {
            # Observation error
-           itau2[i]~ dgamma(4,0.01)
+           itau2[i]~ dgamma(0.2,0.1)
            tau2[i] <- 1/itau2[i]
            }
 
-           for(i in 1:nI)
+           for(i in 1:(nvar)) #MO changed from nI-1
            {
            for(t in 1:N)
            {
@@ -198,13 +226,21 @@ jabba2jags = function(jbinput, dir){
     BtoBmsy[t] <- SB[t]/SBmsy
     }
 
+    for (t in 1:N)  # Overfishing status given state-dependent rule
+    {
+    Overfishing_ind[t]<-ifelse(BtoBmsy[t]>0.866, H[t]/(Hmsy),  H[t]/((Hmsy*SB[t])/(0.866*SBmsy)))
+    }
+
+
     ",append=TRUE)
 
   if(jbinput$settings$CatchOnly==FALSE){
-    cat("
-    # Observation equation in related to EB
+    if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0){
 
-    for(i in 1:nI)
+     cat("
+     # Observation equation in related to EB
+
+    for(i in 1:nran.q)
     {
     for (t in 1:N)
     {
@@ -213,31 +249,130 @@ jabba2jags = function(jbinput, dir){
     CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
     Ihat[t,i]  <- exp(Imean[t,i])
 
-    }}
+    }}",append=TRUE)
+     if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 1){
+  cat("
+      ## added for BFISH index
+      for (t in 68:N){ 
+        
+        Imean[t,2] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,2]))  #( ivar.obs[t,2])
+        I[t, 2] ~ dlnorm(Imean[t,2], survey_precision[t])
+        CPUE[t,2] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+        Ihat[t,2]  <- exp(Imean[t,2])
 
-  ",append=TRUE)}
-  
-    if(jbinput$settings$CatchOnly==TRUE){
+        }
+
+  ",append=TRUE)
+  }else if(length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 2){
       cat("
+      
+      ## added for BFISH index
+      for (t in 68:N){ 
+        
+        Imean[t,3] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,3]))  #( ivar.obs[t,3])
+        I[t, 3] ~ dlnorm(Imean[t,3], survey_precision[t])
+        CPUE[t,3] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+        Ihat[t,3]  <- exp(Imean[t,3])
+
+        }
+      
+      ",append=TRUE)}
+
+  }else{
+    cat("
     # Observation equation in related to EB
-    one <- sets.q
-    for(i in 1:nI)
+
+    for(i in 1:(nI))
     {
     for (t in 1:N)
     {
-    Imean[t,i] <- log(pow(P[1],-1)*P[t]);
+    Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
     I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
     CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
     Ihat[t,i]  <- exp(Imean[t,i])
 
-    }}
+    }}",append=TRUE)
 
-  ",append=TRUE)} 
+  }
+
+    }
+  
+    if(jbinput$settings$CatchOnly==TRUE){
+
+      if(length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0){
+        cat("
+            # Observation equation in related to EB
+              one <- sets.q
+              for(i in 1:(nran.q))
+              {
+              for (t in 1:N)
+              {
+              Imean[t,i] <- log(pow(P[1],-1)*P[t]);
+              I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
+              CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
+              Ihat[t,i]  <- exp(Imean[t,i])
+
+              }}
+        ",append=TRUE)
+
+        if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 1){
+
+          cat("
+          ## added for BFISH index
+              for (t in 68:N){ 
+              
+              Imean[t,2] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+              survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,2]))  #( ivar.obs[t,2])
+              I[t, 2] ~ dlnorm(Imean[t,2], survey_precision[t])
+              CPUE[t,2] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+              Ihat[t,2]  <- exp(Imean[t,2])
+
+              }
+          
+          ",append=TRUE)
+
+
+        }else if(length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 2){
+
+          cat("
+             ## added for BFISH index
+              for (t in 68:N){ 
+              
+              Imean[t,3] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+              survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,3]))  #( ivar.obs[t,3])
+              I[t, 3] ~ dlnorm(Imean[t,3], survey_precision[t])
+              CPUE[t,3] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+              Ihat[t,3]  <- exp(Imean[t,3])
+
+              }
+          
+          ",append=TRUE)
+
+
+        }
+      }else{
+          cat("
+           # Observation equation in related to EB
+            one <- sets.q
+            for(i in 1:(nI))
+            {
+            for (t in 1:N)
+            {
+            Imean[t,i] <- log(pow(P[1],-1)*P[t]);
+            I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
+            CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
+            Ihat[t,i]  <- exp(Imean[t,i])
+
+            }}
+          
+          ",append=TRUE)
+      }
+} 
     
   cat("
       
-    
-   
     # Enforce soft penalty on K if < K_bounds >
     K.pen ~ dnorm(penK,1000) # enforce penalty
     penK  <- ifelse(K<(K_bounds[1]),log(K)-log(K_bounds[1]),ifelse(K>K_bounds[2],log(K)-log(K_bounds[2]),0)) # penalty if Pmean is outside viable biomass
@@ -249,7 +384,7 @@ jabba2jags = function(jbinput, dir){
 
 
     # Enforce soft penalty on observation error if sigma.obs > sigma_bound
-    for(i in 1:nvar){
+    for(i in 1:(nvar)){    #JS - may need to add -1 here... #MO removed
     obs.pen[i] ~ dnorm(penObs[i],1000) # enforce penalty
     penObs[i]  <- ifelse(pow(tau2[i],0.5)>sigmaobs_bound,log(pow(tau2[i],0.5))-log(sigmaobs_bound),0)
     }
@@ -414,6 +549,7 @@ jabba2jags = function(jbinput, dir){
       prH[t,i] <- TAC[t,i]/prB[t,i]
       prHtoHmsy[t,i] <- prH[t,i]/Hmsy
       prBtoBmsy[t,i] <- prB[t,i]/SBmsy
+      prOverfishing_ind[t,i]<-ifelse(prBtoBmsy[t,i]>0.866, prH[t,i]/(Hmsy),  prH[t,i]/((Hmsy*prB[t,i])/(0.866*SBmsy)))
       }}
       ",append=TRUE)} else {
         cat("

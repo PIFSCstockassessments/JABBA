@@ -4,12 +4,14 @@
 \alias{zage}
 \title{zage()}
 \usage{
-zage(ca, ages = "missing")
+zage(ca, ages = "missing", catch.n)
 }
 \arguments{
 \item{ca}{data.frame input with column names year, age, data}
 
 \item{ages}{for which the z slope is taken}
+
+\item{catch.n}{dataframe of catch.n}
 }
 \value{
 data.frame with data = z

@@ -69,6 +69,7 @@
 #' @author Mostly adopted from ss3diags::SSplotEnsemble
 #' @export
 #' @examples
+#' \dontrun{
 #' data(iccat)
 #' bet = iccat$bet 
 #' # Fit Fox and Schaefer
@@ -85,6 +86,7 @@
 #' jbplot_ensemble(prj)
 #' # Zoom in
 #' jbplot_ensemble(prj,xlim=c(2000,2027))
+#' }
 jbplot_ensemble<- function(kb,
                         subplots=1:6,
                         joint=FALSE,
