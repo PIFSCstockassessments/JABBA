@@ -122,7 +122,7 @@ cat("
            for(i in 1:(nvar)) #MO removed
            {
            # Observation error
-           itau2[i]~ dgamma(4,0.01)
+           itau2[i]~ dgamma(0.2,0.1)
            tau2[i] <- 1/itau2[i]
            }
 
