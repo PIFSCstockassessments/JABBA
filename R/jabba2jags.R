@@ -149,18 +149,27 @@ cat("
   }
 ",append=TRUE)} else if(jbinput$settings$catch.error=="random"){
   cat("
+  for(t in 1:N){
+      estC[t] ~ dlnorm(log(TC[t]),pow(CV.C[t],-2))
+  }
+
+",append=TRUE)} else if(jbinput$settings$catch.error=="deep7"){
+
+  cat("
   #JS added uniform component to early years
   #Unrep is ~1/2 of catch, which had +/- 40% in previous assessment - reduce to 0.8,1.2? 
   #40% looks more consistent regarding 95% CIs on plot 
   for(t in 1:55){
-      estC[t] ~ dunif((TC[t]*0.6),(TC[t]*1.4))
+      estC[t] ~ dunif((TC[t]*catch.adj[1]),(TC[t]*catch.adj[2]))
   }
 
   for(t in 56:N){
       estC[t] ~ dlnorm(log(TC[t]),pow(CV.C[t],-2))
   }
 
-",append=TRUE)} else {
+  ", append=TRUE)
+
+} else {
   cat("
   for(t in 1:N){
   cdev[t] ~ dnorm(0,pow(CV.C[t],-2))

@@ -8,8 +8,9 @@
 #' @param scenario = "s1",
 #' @param model.type = c("Schaefer","Fox","Pella","Pella_m"),
 #' @param add.catch.CV = c(TRUE,FALSE) option estimate catch with error
-#' @param catch.cv  catch error on log-scale (default = 0.1)
-#' @param catch.error can be random or directional under reporting "under"
+#' @param catch.cv  catch error on log-scale (default = 0.1), can be a single value or a 2 column dataframe with cols = c(year, catch.cv) and nrows = number of years of catch
+#' @param catch.error can be "random", directional under reporting "under", or "deep7" for first 55 years uniform and rest of years random
+#' @param catch.adj NULL, if catch.error = "deep7", give percent for total catch to be adjusted by (ie c(0.8,1.2)) when setting uniform bounds for estC
 #' @param auxiliary additional time series of either c(Z,Effort,B/B0,B/Bmsy,F/Fmsy)
 #' @param auxiliary,se optional input standard errors on auxilary data 
 #' @param auxiliary.type c("effort","z","bk","bbmsy","ffmsy") 
@@ -70,7 +71,7 @@ build_jabba <- function(
   model.type = c("Schaefer","Fox","Pella","Pella_m"),
   add.catch.CV = TRUE, # to match original assessment
   catch.cv = 0.1, # CV for catch error
-  catch.error = c("random","under")[1], # 
+  catch.error = c("random","under","deep7")[1], # 
   Plim = 0, # Set Plim = Blim/K where recruitment may become impaired (e.g. Plim = 0.25)
   r.dist = c("lnorm","range"), # prior distribution for the intrinsic rate population increas 
   r.prior = c(0.2,0.5), # prior(mu, lod.sd) for intrinsic rate of population increase   
@@ -184,9 +185,8 @@ build_jabba <- function(
   TC = as.numeric(Catch) # Total Catch
   
   # Catch CV option.
-  #JS corrected annual CV from "CV.C =catch.cv[,2]"
   if(add.catch.CV==TRUE){
-    if(length(catch.cv)>1) {CV.C =catch.cv} else {CV.C = rep(catch.cv,length(TC))}
+    if(length(catch.cv)>1) {CV.C =catch.cv[,2]} else {CV.C = rep(catch.cv,length(TC))}
     if(verbose)
       message("\n","><> Assume Catch with error CV = ",mean(CV.C)," <><","\n","\n")
   } else {
