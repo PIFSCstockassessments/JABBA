@@ -490,6 +490,7 @@ if(!is.null(rad.prior)){
   # If Catch Estimation with CV is used
   if(add.catch.CV==TRUE){
     surplus.dat$CV.C = CV.C
+    surplust.dat$catch.adj = catch.adj
     params = c(params,"estC")
     
   }
