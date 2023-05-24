@@ -102,7 +102,7 @@ cat("
       for(i in 1:(nvar))  #JS added -1 #MO removed
       {
       # Observation error
-      itau2[i]~ dgamma(0.2,1.0)    #These are (0.001,0.001) OR (0.2,1.0) in previous assessment
+      itau2[i]~ dgamma(0.2,0.1)   #These are (0.001,0.001) OR (0.2,0.1) in previous assessment
       tau2[i] <- 1/itau2[i]
       }
 

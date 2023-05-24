@@ -2,11 +2,11 @@ test_that("fit_jabba works", {
   #load in test data, should include dfs for catch, cpue, and se
   load(test_path("fixtures", "test_data.RData"))
   #create simple jabba input object
-  jabba_obj <- build_jabba(catch = test.catch, 
+  jabba_obj_abs <- build_jabba(catch = test.catch, 
                            cpue = test.cpue,
                            se = test.se, verbose = FALSE)
   #fit jabba model
-  fit_test <- fit_jabba(jabba_obj, ni = 30000, nt = 5, nb = 5000, nc = 2, save.csvs = TRUE, output.dir = test_path("Fixtures"))
+  fit_test_abs <- fit_jabba(jabba_obj_abs, ni = 30000, nt = 5, nb = 5000, nc = 2, save.csvs = TRUE, output.dir = test_path("Fixtures"), jagsdir = test_path("Fixtures"))
   expect_equal(fit_test$pars$Median[2], 0.29887245227) #r
   expect_equal(fit_test$pars$Median[5], 0.88068436754) #psi
   expect_equal(fit_test$pars$Median[9], 2.00000000000) #m
@@ -21,3 +21,4 @@ test_that("fit_jabba works", {
   unlink(test_path("fixtures", "*.csv"))
   
 })
+
