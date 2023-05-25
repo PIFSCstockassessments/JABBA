@@ -114,7 +114,7 @@ jbplot_catcherror <- function(jabba,output.dir=getwd(),as.png = FALSE,add=FALSE,
     years = jabba$yr
     cord.x <- c(jabba$yr,rev(jabba$yr))
     cord.y<-c(predC[,3],rev(predC[,4]))
-    plot(years,(jabba$catch),type="n",ylim=c(0,max(predC,na.rm=T)),lty=1,lwd=1.3,xlab="Year",ylab=paste0("Catch ",jabba$settings$catch.metric),main="")
+    plot(years,(jabba$catch),type="n",ylim=c(0,max(predC[,-1],na.rm=T)),lty=1,lwd=1.3,xlab="Year",ylab=paste0("Catch ",jabba$settings$catch.metric),main="")
     polygon(cord.x,cord.y,col="gray",border=0,lty=1)
     lines(years,predC[,2],lwd=2,col=4)
     points(years,(jabba$catch),pch=21,bg=0,cex=1.5)
@@ -320,12 +320,12 @@ jbplot_cpuefits <- function(jabba,index=NULL, output.dir=getwd(),add=FALSE,as.pn
         jabba$cpue.hat[,,1:(di-1)] =  jabba$cpue.hat[,,2:(di)] 
         
       } else {
-        jabba$settings$nI = jabba$settings$nI+jabba$settings$nA
+        jabba$settings$nI = jabba$settings$nq+jabba$settings$nA #MO changed from nI to nq
         jabba$settings$I = cbind(jabba$settings$I,as.matrix(jabba$settings$A))
         jabba$settings$SE2 = cbind(jabba$settings$SE2,as.matrix(jabba$settings$A.SE2))
       }
     }
-      if(is.null(index)) index = 1:jabba$settings$nI
+      if(is.null(index)) index = 1:jabba$settings$nq #MO changed from nI to nq
     
     
     N = jabba$settings$N
@@ -484,12 +484,12 @@ jbplot_logfits <- function(jabba,index=NULL, output.dir=getwd(),add=FALSE,as.png
         
         
       } else {
-        jabba$settings$nI = jabba$settings$nI+jabba$settings$nA
+        jabba$settings$nI = jabba$settings$nq+jabba$settings$nA #MO changed
         jabba$settings$I = cbind(jabba$settings$I,as.matrix(jabba$settings$A))
         jabba$settings$SE2 = cbind(jabba$settings$SE2,as.matrix(jabba$settings$A.SE2))
       }
     }
-    if(is.null(index)) index = 1:jabba$settings$nI
+    if(is.null(index)) index = 1:jabba$settings$nq #MO changed from nI
     
     N = jabba$settings$N
     years= jabba$yr
@@ -618,7 +618,7 @@ jbplot_residuals <- function(jabba,output.dir=getwd(),as.png = FALSE,add=FALSE, 
         jabba$settings$I = as.matrix(jabba$settings$A)
         jabba$settings$SE2 = as.matrix(jabba$settings$A.SE2)
       } else {
-        jabba$settings$nI = jabba$settings$nI+jabba$settings$nA
+        jabba$settings$nI = jabba$settings$nq+jabba$settings$nA #MO changed
         jabba$settings$I = cbind(jabba$settings$I,as.matrix(jabba$settings$A))
         jabba$settings$SE2 = cbind(jabba$settings$SE2,as.matrix(jabba$settings$A.SE2))
       }
@@ -631,9 +631,9 @@ jbplot_residuals <- function(jabba,output.dir=getwd(),as.png = FALSE,add=FALSE, 
     Resids = jabba$residuals
     Yr = jabba$yr
     n.years = length(Yr)
-    n.indices = jabba$settings$nI
+    n.indices = jabba$settings$nq #MO changed
     indices = unique(jabba$diags$name)
-    series = 1:jabba$settings$nI
+    series = 1:jabba$settings$nq #MO changed
 
     # JABBA-residual plot
     Par = list(mfrow=c(1,1),mar = c(3.5, 3.5, 0.1, 0.1), mgp =c(2.,0.5,0), tck = -0.02,cex=0.8)
@@ -691,9 +691,9 @@ jbplot_stdresiduals <- function(jabba, output.dir=getwd(),as.png=FALSE,add=FALSE
     Resids = jabba$residuals
     Yr = jabba$yr
     n.years = length(Yr)
-    n.indices = jabba$settings$nI
+    n.indices = jabba$settings$nq #MO changed
     indices = unique(jabba$diags$name)
-    series = 1:jabba$settings$nI
+    series = 1:jabba$settings$nq #MO changed
     StResid = jabba$std.residuals
 
     Par = list(mfrow=c(1,1),mar = c(3.5, 3.5, 0.1, 0.1), mgp =c(2.,0.5,0), tck = -0.02,cex=0.8)

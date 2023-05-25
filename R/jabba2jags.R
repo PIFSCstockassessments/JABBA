@@ -110,7 +110,7 @@ cat("
       {
       for(t in 1:N)
       {
-      var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]]
+      var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]] #TODO add if statment here if add obs error for BFISH, else var.obs <- SE2
       ivar.obs[t,i] <- 1/var.obs[t,i]
       # note total observation error (TOE)
       TOE[t,i] <- sqrt(var.obs[t,i]) # Total observation variance
@@ -246,10 +246,10 @@ cat("
      if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 1){
   cat("
       ## added for BFISH index
-      for (t in 68:N){ 
+      for (t in 1:N){ 
         
         Imean[t,2] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
-        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,2]))  #( ivar.obs[t,2])
+        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,2]))  #( ivar.obs[t,2]) #TODO: change SE2 to ivar.obs
         I[t, 2] ~ dlnorm(Imean[t,2], survey_precision[t])
         CPUE[t,2] <- P[t]*K/(q[sets.q[nq]]*n.grid)
         Ihat[t,2]  <- exp(Imean[t,2])
@@ -261,7 +261,7 @@ cat("
       cat("
       
       ## added for BFISH index
-      for (t in 68:N){ 
+      for (t in 1:N){ 
         
         Imean[t,3] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
         survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,3]))  #( ivar.obs[t,3])
@@ -314,7 +314,7 @@ cat("
 
           cat("
           ## added for BFISH index
-              for (t in 68:N){ 
+              for (t in 1:N){ 
               
               Imean[t,2] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
               survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,2]))  #( ivar.obs[t,2])
@@ -331,7 +331,7 @@ cat("
 
           cat("
              ## added for BFISH index
-              for (t in 68:N){ 
+              for (t in 1:N){ 
               
               Imean[t,3] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
               survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,3]))  #( ivar.obs[t,3])
