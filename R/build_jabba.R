@@ -72,6 +72,7 @@ build_jabba <- function(
   add.catch.CV = TRUE, # to match original assessment
   catch.cv = 0.1, # CV for catch error
   catch.error = c("random","under","deep7")[1], # 
+  catch.adj = NULL,
   Plim = 0, # Set Plim = Blim/K where recruitment may become impaired (e.g. Plim = 0.25)
   r.dist = c("lnorm","range"), # prior distribution for the intrinsic rate population increas 
   r.prior = c(0.2,0.5), # prior(mu, lod.sd) for intrinsic rate of population increase   
@@ -490,9 +491,11 @@ if(!is.null(rad.prior)){
   # If Catch Estimation with CV is used
   if(add.catch.CV==TRUE){
     surplus.dat$CV.C = CV.C
-    surplust.dat$catch.adj = catch.adj
     params = c(params,"estC")
     
+  }
+  if(catch.error == "deep7"){
+    surplus.dat$catch.adj = catch.adj
   }
   
   if(Auxiliary){
