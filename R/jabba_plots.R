@@ -114,7 +114,7 @@ jbplot_catcherror <- function(jabba,output.dir=getwd(),as.png = FALSE,add=FALSE,
     years = jabba$yr
     cord.x <- c(jabba$yr,rev(jabba$yr))
     cord.y<-c(predC[,3],rev(predC[,4]))
-    plot(years,(jabba$catch),type="n",ylim=c(0,max(predC,na.rm=T)),lty=1,lwd=1.3,xlab="Year",ylab=paste0("Catch ",jabba$settings$catch.metric),main="")
+    plot(years,(jabba$catch),type="n",ylim=c(0,max(predC[,-1],na.rm=T)),lty=1,lwd=1.3,xlab="Year",ylab=paste0("Catch ",jabba$settings$catch.metric),main="")
     polygon(cord.x,cord.y,col="gray",border=0,lty=1)
     lines(years,predC[,2],lwd=2,col=4)
     points(years,(jabba$catch),pch=21,bg=0,cex=1.5)
