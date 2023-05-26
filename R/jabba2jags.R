@@ -111,7 +111,7 @@ cat("
       for(t in 1:N)
       {
       var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]]
-      ivar.obs[t,i] <- 1/var.obs[t,i]
+      ivar.obs[t,i] <- (cpue_lambda[i]*cpue_lambda[i])/var.obs[t,i] #JS added CPUE_lambda
       # note total observation error (TOE)
       TOE[t,i] <- sqrt(var.obs[t,i]) # Total observation variance
 
@@ -298,8 +298,7 @@ cat("
     for (t in 1:N)
     {
     Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
-    cpue_precision[t,i] <- (cpue_lambda[i]*cpue_lambda[i])/(ivar.obs[t,i]) #JS added cpue lambda
-    I[t,i] ~ dlnorm(Imean[t,i],cpue_precision[t,i]);
+    I[t,i] ~ dlnorm(Imean[t,i],ivar.obs[t,i]);
     CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
     Ihat[t,i]  <- exp(Imean[t,i])
 
