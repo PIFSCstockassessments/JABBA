@@ -133,7 +133,7 @@ cat("
            var.obs[t,i] <- SE2[t,i] # drop tau2
            fake.tau[t,i] <- tau2[sets.var[i]]
 
-           ivar.obs[t,i] <- 1/var.obs[t,i]
+           ivar.obs[t,i] <- (cpue_lambda[i]*cpue_lambda[i])/var.obs[t,i]  #JS added CPUE_lambda
            # note total observation error (TOE)
            TOE[t,i] <- sqrt(var.obs[t,i])
 
