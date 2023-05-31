@@ -1255,7 +1255,7 @@ plot(1000,1000,type="b", xlim=c(0,max(1/(jabba$refpts$bmsy/jabba$refpts$k)[1],mu
 # Kobe plot layout setting
 x_max  <- max(1/(jabba$refpts$bmsy/jabba$refpts$k)[1],mu.b[,1])
 x_min  <- 0
-y_max  <- max(mu.f[,1],quantile(f,0.85),2.)
+y_max  <- max(mu.f[,1],quantile(of,0.85),2.)
 y_min  <- 0
 MSST_x <- max(0.5,bfrac) #bfrac = 1-M
 max_yr <- max(years)
