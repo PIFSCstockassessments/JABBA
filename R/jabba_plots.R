@@ -146,7 +146,9 @@ jbplot_ppdist <- function(jabba, output.dir=getwd(),as.png = FALSE,mfrow=c(round
   node_id = names(out)
   #informative priors
   Prs = as.matrix(cbind(jabba$settings$K.pr,jabba$settings$r.pr,c(0,0),jabba$settings$psi.pr))
-
+  if(!is.null(jabba$settings$rad.pr)){
+    Prs = cbind(Prs, jabba$settings$rad.pr)
+  }
   #Posteriors
   Par = list(mfrow=mfrow,mai=c(0.4,0.1,0,.1),omi = c(0.3,0.5,0.1,0) + 0.1,mgp=c(1,0.1,0), tck = -0.02,cex=0.8)
   if(as.png){png(file = paste0(output.dir,"/Posteriors_",jabba$assessment,"_",jabba$scenario,".png"),width  = width, height = height,
@@ -234,10 +236,22 @@ jbplot_ppdist <- function(jabba, output.dir=getwd(),as.png = FALSE,mfrow=c(round
       if(jabba$settings$sigma.proc!=TRUE & i==length(node_id)) {
         plot(1,1,type="n",xlim=range(0,0.15^2),yaxt="n",xlab=paste(node_id[i]),ylab="",xaxs="i",yaxs="i")
         abline(v=jabba$settings$sigma.proc^2,lwd=2)} else {
+          
+          if(length(grep("rad", node_id)) > 0){ #MO adding prior distribution for radius
+            radpr =  rlnorm(10000,log(Prs[1,5]),Prs[2,5])
+            pdf = stats::density(post.par,adjust=2)
+            prior = dlnorm(sort(radpr),log(Prs[1,5]),Prs[2,5])
+            plot(pdf,type="l",ylim=range(prior,pdf$y),xlim=range(c(pdf$x,quantile(radpr,c(0.0001,0.95)))),yaxt="n",xlab=paste(node_id[i]),ylab="",xaxs="i",yaxs="i",main="")
+            polygon(c(sort(radpr),rev(sort(radpr))),c(prior,rep(0,length(sort(radpr)))),col=gray(0.4,1))
+            polygon(c(pdf$x,rev(pdf$x)),c(pdf$y,rep(0,length(pdf$y))),col=gray(0.7,0.7))
+            legend('right',c("Prior","Posterior"),pch=22,cex=cex+0.1,pt.cex=cex+0.1,pt.bg = c(grey(0.4,1),grey(0.8,0.6)),bty="n")
+            PPVR = round((sd(post.par)/mean(post.par))^2/(sd(radpr)/mean(radpr))^2,3)
+            PPVM = round(mean(post.par)/mean(radpr),3)
 
-          pdf = stats::density(post.par,adjust=2)
-          plot(pdf,type="l",xlim=range(0,post.par),yaxt="n",xlab=paste(node_id[i]),ylab="",xaxs="i",yaxs="i",main="")
-          if(i==length(node_id)& jabba$settings$igamma[1]>0.9){
+          }else{
+            pdf = stats::density(post.par,adjust=2)
+            plot(pdf,type="l",xlim=range(0,post.par),yaxt="n",xlab=paste(node_id[i]),ylab="",xaxs="i",yaxs="i",main="")
+            if(i==length(node_id)& jabba$settings$igamma[1]>0.9){
             rpr = 1/rgamma(10000,jabba$settings$igamma[1],jabba$settings$igamma[2])
             prior = stats::density(rpr,adjust=2)
             polygon(c(prior$x,rev(prior$x)),c(prior$y,rep(0,length(prior$y))),col=gray(0.4,1))
@@ -249,6 +263,7 @@ jbplot_ppdist <- function(jabba, output.dir=getwd(),as.png = FALSE,mfrow=c(round
 
           polygon(c(pdf$x,rev(pdf$x)),c(pdf$y,rep(0,length(pdf$y))),col=gray(0.7,0.7))
           #legend('topright',c("Posterior"),pch=22,pt.cex=1.5,pt.bg = c(grey(0.8,0.6)),bty="n")
+          }
         } }
 
   }
@@ -320,12 +335,12 @@ jbplot_cpuefits <- function(jabba,index=NULL, output.dir=getwd(),add=FALSE,as.pn
         jabba$cpue.hat[,,1:(di-1)] =  jabba$cpue.hat[,,2:(di)] 
         
       } else {
-        jabba$settings$nI = jabba$settings$nI+jabba$settings$nA
+        jabba$settings$nI = jabba$settings$nq+jabba$settings$nA #MO changed from nI to nq
         jabba$settings$I = cbind(jabba$settings$I,as.matrix(jabba$settings$A))
         jabba$settings$SE2 = cbind(jabba$settings$SE2,as.matrix(jabba$settings$A.SE2))
       }
     }
-      if(is.null(index)) index = 1:jabba$settings$nI
+      if(is.null(index)) index = 1:jabba$settings$nq #MO changed from nI to nq
     
     
     N = jabba$settings$N
@@ -484,12 +499,12 @@ jbplot_logfits <- function(jabba,index=NULL, output.dir=getwd(),add=FALSE,as.png
         
         
       } else {
-        jabba$settings$nI = jabba$settings$nI+jabba$settings$nA
+        jabba$settings$nI = jabba$settings$nq+jabba$settings$nA #MO changed
         jabba$settings$I = cbind(jabba$settings$I,as.matrix(jabba$settings$A))
         jabba$settings$SE2 = cbind(jabba$settings$SE2,as.matrix(jabba$settings$A.SE2))
       }
     }
-    if(is.null(index)) index = 1:jabba$settings$nI
+    if(is.null(index)) index = 1:jabba$settings$nq #MO changed from nI
     
     N = jabba$settings$N
     years= jabba$yr
@@ -618,7 +633,7 @@ jbplot_residuals <- function(jabba,output.dir=getwd(),as.png = FALSE,add=FALSE, 
         jabba$settings$I = as.matrix(jabba$settings$A)
         jabba$settings$SE2 = as.matrix(jabba$settings$A.SE2)
       } else {
-        jabba$settings$nI = jabba$settings$nI+jabba$settings$nA
+        jabba$settings$nI = jabba$settings$nq+jabba$settings$nA #MO changed
         jabba$settings$I = cbind(jabba$settings$I,as.matrix(jabba$settings$A))
         jabba$settings$SE2 = cbind(jabba$settings$SE2,as.matrix(jabba$settings$A.SE2))
       }
@@ -631,9 +646,9 @@ jbplot_residuals <- function(jabba,output.dir=getwd(),as.png = FALSE,add=FALSE, 
     Resids = jabba$residuals
     Yr = jabba$yr
     n.years = length(Yr)
-    n.indices = jabba$settings$nI
+    n.indices = jabba$settings$nq #MO changed
     indices = unique(jabba$diags$name)
-    series = 1:jabba$settings$nI
+    series = 1:jabba$settings$nq #MO changed
 
     # JABBA-residual plot
     Par = list(mfrow=c(1,1),mar = c(3.5, 3.5, 0.1, 0.1), mgp =c(2.,0.5,0), tck = -0.02,cex=0.8)
@@ -691,9 +706,9 @@ jbplot_stdresiduals <- function(jabba, output.dir=getwd(),as.png=FALSE,add=FALSE
     Resids = jabba$residuals
     Yr = jabba$yr
     n.years = length(Yr)
-    n.indices = jabba$settings$nI
+    n.indices = jabba$settings$nq #MO changed
     indices = unique(jabba$diags$name)
-    series = 1:jabba$settings$nI
+    series = 1:jabba$settings$nq #MO changed
     StResid = jabba$std.residuals
 
     Par = list(mfrow=c(1,1),mar = c(3.5, 3.5, 0.1, 0.1), mgp =c(2.,0.5,0), tck = -0.02,cex=0.8)
@@ -1203,6 +1218,7 @@ jbplot_kobe <-  function(jabba ,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=F
 #' 
 #' Used for PIFSC stocks where reference points are BMSY(1-M)
 #' @param jabba output list from fit_jabba
+#' @param bfrac fraction of bmsy for reference point
 #' @param output.dir directory to save plots
 #' @param ylab yaxis label
 #' @param xlab xaxis label
@@ -1212,7 +1228,7 @@ jbplot_kobe <-  function(jabba ,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=F
 #' @param height plot height
 #' @param verbose silent option
 #' @export
-jbplot_kobe_bfrac <- function(){
+jbplot_kobe_bfrac <- function(jabba,bfrac=bfrac,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=FALSE,add=FALSE,width=5,height=4.5,verbose=TRUE){
 
  if(verbose) cat(paste0("\n","><> jbplot_kobe_bfrac() - Stock Status Plot  <><","\n"))
 
@@ -1223,7 +1239,7 @@ years=jabba$yr
 N = length(years)
 of = jabba$posteriors$Overfishing_ind[,N] #probability of overfishing in terminal year
 # fit kernel function
-kernelF <- gplots::ci2d(b,f,nbins=151,factor=1.5,ci.levels=c(0.50,0.80,0.75,0.90,0.95),show="none",col=1,xlab= ifelse(jabba$settings$harvest.label=="Fmsy",expression(paste(F/F[MSY])),expression(paste(H/H[MSY]))),ylab=expression(paste(B/B[MSY])))
+kernelF <- gplots::ci2d(b,of,nbins=151,factor=1.5,ci.levels=c(0.50,0.80,0.75,0.90,0.95),show="none",col=1,xlab= ifelse(jabba$settings$harvest.label=="Fmsy",expression(paste(F/F[MSY])),expression(paste(H/H[MSY]))),ylab=expression(paste(B/B[MSY])))
 
 Par = list(mfrow=c(1,1),mar = c(3.5, 3.5, 0.1, 0.1), mgp =c(2.,0.5,0), tck = -0.02,cex=0.8)
 if(as.png==TRUE){ png(file = paste0(output.dir,"/Kobe_",jabba$assessment,"_",jabba$scenario,".png"), width = width, height = height,
@@ -1234,12 +1250,12 @@ if(add==FALSE) par(Par)
 if(is.null(ylab)) ylab=ifelse(jabba$settings$harvest.label=="Fmsy",expression(paste(F/F[MSY])),expression(paste(H/H[MSY])))
 if(is.null(xlab)) xlab=expression(paste(B/(B[MSY](1-M))))
 
-plot(1000,1000,type="b", xlim=c(0,max(1/(jabba$refpts$bmsy/jabba$refpts$k)[1],mu.b[,1]) +0.05), ylim=c(0,max(mu.f[,1],quantile(f,0.85),2.)),lty=3,ylab=ylab,xlab=xlab,xaxs="i",yaxs="i")
+plot(1000,1000,type="b", xlim=c(0,max(1/(jabba$refpts$bmsy/jabba$refpts$k)[1],mu.b[,1]) +0.05), ylim=c(0,max(mu.f[,1],quantile(of,0.85),2.)),lty=3,ylab=ylab,xlab=xlab,xaxs="i",yaxs="i")
 
 # Kobe plot layout setting
 x_max  <- max(1/(jabba$refpts$bmsy/jabba$refpts$k)[1],mu.b[,1])
 x_min  <- 0
-y_max  <- max(mu.f[,1],quantile(f,0.85),2.)
+y_max  <- max(mu.f[,1],quantile(of,0.85),2.)
 y_min  <- 0
 MSST_x <- max(0.5,bfrac) #bfrac = 1-M
 max_yr <- max(years)
