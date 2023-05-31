@@ -1218,6 +1218,7 @@ jbplot_kobe <-  function(jabba ,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=F
 #' 
 #' Used for PIFSC stocks where reference points are BMSY(1-M)
 #' @param jabba output list from fit_jabba
+#' @param bfrac fraction of bmsy for reference point
 #' @param output.dir directory to save plots
 #' @param ylab yaxis label
 #' @param xlab xaxis label
@@ -1227,7 +1228,7 @@ jbplot_kobe <-  function(jabba ,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=F
 #' @param height plot height
 #' @param verbose silent option
 #' @export
-jbplot_kobe_bfrac <- function(){
+jbplot_kobe_bfrac <- function(jabba,bfrac=bfrac,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=FALSE,add=FALSE,width=5,height=4.5,verbose=TRUE){
 
  if(verbose) cat(paste0("\n","><> jbplot_kobe_bfrac() - Stock Status Plot  <><","\n"))
 
