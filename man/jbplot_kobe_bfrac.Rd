@@ -4,16 +4,29 @@
 \alias{jbplot_kobe_bfrac}
 \title{Kobe plot with state-dependent reference point}
 \usage{
-jbplot_kobe_bfrac()
+jbplot_kobe_bfrac(
+  jabba,
+  bfrac = bfrac,
+  ylab = NULL,
+  xlab = NULL,
+  output.dir = getwd(),
+  as.png = FALSE,
+  add = FALSE,
+  width = 5,
+  height = 4.5,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{jabba}{output list from fit_jabba}
 
-\item{output.dir}{directory to save plots}
+\item{bfrac}{fraction of bmsy for reference point}
 
 \item{ylab}{yaxis label}
 
 \item{xlab}{xaxis label}
+
+\item{output.dir}{directory to save plots}
 
 \item{as.png}{save as png file of TRUE}
 
