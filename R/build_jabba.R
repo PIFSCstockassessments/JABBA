@@ -23,6 +23,7 @@
 #' @param K.prior = NULL, # prior(mu,CV) for the unfished biomass K = B0
 #' @param psi.dist = c("lnorm","beta"), # prior distribution for the initial biomass depletion B[1]/K
 #' @param psi.prior = c(0.9,0.25), # prior(mu, CV) for the initial biomass depletion B[1]/K
+#' @param cpue_lambda = rep(1,ncol(cpue)-1) #vector of cpue series weights length of the number of cpue series, defaults to 1 for all cpue
 #' @param index_type default NULL, use "absolute" for surveys of absolute abundance estimates (eg BFISH older version) or "relative" for surveys of relative abundance, vector length of ncol(cpue)-1
 #' @param rad.prior default NULL, if including radius prior: c(target_rad_mean,CV_rad),  
 #' @param n.grid NULL, number of sampling grids in a domain
@@ -80,6 +81,7 @@ build_jabba <- function(
   K.prior = NULL, # prior(mu,CV) for the unfished biomass K = B0
   psi.dist = c("lnorm","beta"), # prior distribution for the initial biomass depletion B[1]/K
   psi.prior = c(0.9,0.25), # depletionprior(mu, CV) for the initial biomass depletion B[1]/K
+  cpue_lambda = rep(1,ncol(cpue)-1), #vector of cpue series weights
   index_type = NULL, #default is NULL
   rad.prior = NULL, #c(target_rad_mean,CV_rad),  only specify if index_type has an absolute type
   n.grid = NULL,
@@ -476,7 +478,7 @@ if(!is.null(rad.prior)){
   }else{
     surplus.dat = list(N=n.years, TC = TC,I=CPUE,SE2=se2,r.pr=r.pr,psi.pr=psi.pr,K.pr = K.pr,
                      nq=nq,nI = nI,nvar=nvar,sigma.fixed=ifelse(sigma.proc==TRUE,0,sigma.proc),
-                     sets.var=sets.var, sets.q=sets.q,Plim=Plim,slope.HS=slope.HS,
+                     sets.var=sets.var, sets.q=sets.q,cpue_lambda=cpue_lambda,Plim=Plim,slope.HS=slope.HS,
                      nTAC=nTAC,pyrs=pyrs,TAC=TAC,igamma = igamma,stI=stI,pen.P = rep(0,n.years) ,pen.bk = rep(0,n.years),proc.pen=0,K.pen = 0,
                      obs.pen = rep(0,nvar),P_bound=P_bound,q_bounds=q_bounds,sigmaobs_bound=sigmaobs_bound,sigmaproc_bound=sigmaproc_bound,K_bounds=K_bounds,mu.m=m,b.yr=b.yr, b.pr = b.pr)
     params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","Overfishing_ind","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","prOverfishing_ind","TOE")

@@ -162,8 +162,8 @@ cat("
       {
       for(t in 1:N)
       {
-      var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]] 
-      ivar.obs[t,i] <- 1/var.obs[t,i]
+      var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]]
+      ivar.obs[t,i] <- (cpue_lambda[i]*cpue_lambda[i])/var.obs[t,i] #JS added CPUE_lambda (cpue_lambda[i]*cpue_lambda[i])
       # note total observation error (TOE)
       TOE[t,i] <- sqrt(var.obs[t,i]) # Total observation variance
 
@@ -194,7 +194,7 @@ cat("
            var.obs[t,i] <- SE2[t,i] # drop tau2
            fake.tau[t,i] <- tau2[sets.var[i]]
 
-           ivar.obs[t,i] <- 1/var.obs[t,i]
+           ivar.obs[t,i] <- (cpue_lambda[i]*cpue_lambda[i])/var.obs[t,i]  #JS added CPUE_lambda (cpue_lambda[i]*cpue_lambda[i])
            # note total observation error (TOE)
            TOE[t,i] <- sqrt(var.obs[t,i])
 
@@ -326,7 +326,7 @@ cat("
       for (t in 1:N){ 
         
         Imean[t,2] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
-        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(ivar.obs[t,2]))  #( ivar.obs[t,2]) #MO changed SE2 to ivar.obs
+        survey_precision[t] <- (s_lambda*s_lambda)/((ivar.obs[t,2]))  #( ivar.obs[t,2]) #MO changed SE2 to ivar.obs
         I[t, 2] ~ dlnorm(Imean[t,2], survey_precision[t])
         CPUE[t,2] <- P[t]*K/(q[sets.q[nq]]*n.grid)
         Ihat[t,2]  <- exp(Imean[t,2])
@@ -341,7 +341,7 @@ cat("
       for (t in 1:N){ 
         
         Imean[t,3] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
-        survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(ivar.obs[t,3]))  #( ivar.obs[t,3])
+        survey_precision[t] <- (s_lambda*s_lambda)/((ivar.obs[t,3]))  #( ivar.obs[t,3])
         I[t, 3] ~ dlnorm(Imean[t,3], survey_precision[t])
         CPUE[t,3] <- P[t]*K/(q[sets.q[nq]]*n.grid)
         Ihat[t,3]  <- exp(Imean[t,3])
@@ -359,7 +359,7 @@ cat("
     for (t in 1:N)
     {
     Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
-    I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
+    I[t,i] ~ dlnorm(Imean[t,i],ivar.obs[t,i]);
     CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
     Ihat[t,i]  <- exp(Imean[t,i])
 
@@ -394,7 +394,7 @@ cat("
               for (t in 1:N){ 
               
               Imean[t,2] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
-              survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,2]))  #( ivar.obs[t,2])
+              survey_precision[t] <- (s_lambda*s_lambda)/(SE2[t,2])  #( ivar.obs[t,2]) #JS deleted sqrt of SE2
               I[t, 2] ~ dlnorm(Imean[t,2], survey_precision[t])
               CPUE[t,2] <- P[t]*K/(q[sets.q[nq]]*n.grid)
               Ihat[t,2]  <- exp(Imean[t,2])
@@ -411,7 +411,7 @@ cat("
               for (t in 1:N){ 
               
               Imean[t,3] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
-              survey_precision[t] <- (s_lambda*s_lambda)/( sqrt(SE2[t,3]))  #( ivar.obs[t,3])
+              survey_precision[t] <- (s_lambda*s_lambda)/(SE2[t,3])  #( ivar.obs[t,3]) #JS deleted sqrt of SE2
               I[t, 3] ~ dlnorm(Imean[t,3], survey_precision[t])
               CPUE[t,3] <- P[t]*K/(q[sets.q[nq]]*n.grid)
               Ihat[t,3]  <- exp(Imean[t,3])
