@@ -206,6 +206,9 @@ fit_jabba = function(jbinput,
   
   heidle = coda::heidel.diag(data.frame(par.dat))
   
+  jagsfit.mcmc = coda::as.mcmc(par.dat)
+ 
+  autocorr = coda::autocorr.diag(jagsfit.mcmc)
   # postrior means + 95% BCIs
   man.dat = data.frame(posteriors[params[8:10]],bmsyk=as.numeric(posteriors$SBmsy)/as.numeric(posteriors$K))
   
@@ -224,7 +227,9 @@ fit_jabba = function(jbinput,
   
   results = t(cbind(apply(par.dat,2,quantile,c(0.025,0.5,0.975)))) 
   
-  results = data.frame(Median = results[,2],LCI=results[,1],UCI=results[,3],Geweke.p=round(pvalues,3),Heidel.p = round(heidle[,3],3))
+  results = data.frame(Median = results[,2],LCI=results[,1],UCI=results[,3],
+  Geweke.p=round(pvalues,3),Heidel.p = round(heidle[,3],3), 
+  Autocorr_lag1 = autocorr[2,], Autocorr_lag5 = autocorr[3,], Autocorr_lag10 = autocorr[4,])
   #JS added Overfishing ref point below, need to check dims
   #ref.points = round(t(cbind(apply(man.dat[,1:4],2,quantile,c(0.025,0.5,0.975)),sum(man.dat[,5])/dim(man.dat)[2])),3)
   ref.points = round(t(cbind(apply(man.dat,2,quantile,c(0.025,0.5,0.975)))),3)
