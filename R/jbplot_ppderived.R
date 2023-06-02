@@ -18,7 +18,7 @@ if(verbose) cat(paste0("\n","><> jbplot_ppderived() - prior and posterior distri
 
 Prs = as.matrix(cbind(jabba$settings$K.pr,jabba$settings$r.pr,c(jabba$settings$mu.m, jabba$settings$m.CV)))
 out = jabba$refpts_posterior
-node_id = names(posteriors) 
+node_id = names(out) 
 node_id = node_id[node_id %in% quants]
 
 Par = list(mfrow=mfrow,mai=c(0.4,0.1,0,.1),omi = c(0.3,0.5,0.1,0) + 0.1,mgp=c(1,0.1,0), tck = -0.02,cex=0.8)
