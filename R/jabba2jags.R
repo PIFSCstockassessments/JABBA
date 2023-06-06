@@ -111,8 +111,8 @@ cat("
       {
       for(t in 1:N)
       {
-      var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]] #TODO add if statment here if add obs error for BFISH, else var.obs <- SE2
-      ivar.obs[t,i] <- 1/var.obs[t,i]
+      var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]] 
+      ivar.obs[t,i] <- (cpue_lambda[i]*cpue_lambda[i])/var.obs[t,i]
       # note total observation error (TOE)
       TOE[t,i] <- sqrt(var.obs[t,i]) # Total observation variance
 
@@ -133,8 +133,8 @@ cat("
       {
       for(t in 1:N)
       {
-      var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]] #TODO add if statment here if add obs error for BFISH, else var.obs <- SE2
-      ivar.obs[t,i] <- 1/var.obs[t,i]
+      var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]] 
+      ivar.obs[t,i] <- (cpue_lambda[i]*cpue_lambda[i])/var.obs[t,i]
       # note total observation error (TOE)
       TOE[t,i] <- sqrt(var.obs[t,i]) # Total observation variance
 
