@@ -16,7 +16,8 @@ build_jabba(
   model.type = c("Schaefer", "Fox", "Pella", "Pella_m"),
   add.catch.CV = TRUE,
   catch.cv = 0.1,
-  catch.error = c("random", "under")[1],
+  catch.error = c("random", "under", "deep7")[1],
+  catch.adj = NULL,
   Plim = 0,
   r.dist = c("lnorm", "range"),
   r.prior = c(0.2, 0.5),
@@ -79,9 +80,11 @@ build_jabba(
 
 \item{add.catch.CV}{= c(TRUE,FALSE) option estimate catch with error}
 
-\item{catch.cv}{catch error on log-scale (default = 0.1)}
+\item{catch.cv}{catch error on log-scale (default = 0.1), can be a single value or a 2 column dataframe with cols = c(year, catch.cv) and nrows = number of years of catch}
 
-\item{catch.error}{can be random or directional under reporting "under"}
+\item{catch.error}{can be "random", directional under reporting "under", or "deep7" for first 55 years uniform and rest of years random}
+
+\item{catch.adj}{NULL, if catch.error = "deep7", give percent for total catch to be adjusted by (ie c(0.8,1.2)) when setting uniform bounds for estC}
 
 \item{Plim}{= 0, # Set Plim = Blim/K where recruitment may become impaired (e.g. Plim = 0.25)
 PRIORS}
