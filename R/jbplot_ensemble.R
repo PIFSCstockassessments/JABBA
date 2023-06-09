@@ -387,7 +387,7 @@ jbplot_ensemble<- function(kb,
     quant=quants[s]
     plot_quants(quant)   
     }
-    dev.off()
+    #dev.off()
     if(kbout) return(kb)
   } # endplot
 
