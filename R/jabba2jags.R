@@ -97,7 +97,7 @@ cat("
            ",append=TRUE)}
   
   if(jbinput$settings$sigma.est==TRUE){
-    if(jbinput$jagsdata$nvar == jbinput$jagsdata$nq){
+    if(jbinput$settings$nran.q == 0){
       cat("
       # Observation variance
       for(i in 1:(nvar))  #JS added -1 #MO removed
