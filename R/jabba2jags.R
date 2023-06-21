@@ -97,28 +97,7 @@ cat("
            ",append=TRUE)}
   
   if(jbinput$settings$sigma.est==TRUE){
-    if(jbinput$jagsdata$nvar == jbinput$jagsdata$nq){
-      cat("
-      # Observation variance
-      for(i in 1:(nvar))  #JS added -1 #MO removed
-      {
-      # Observation error
-      itau2[i]~ dgamma(0.2,0.1)   #These are (0.001,0.001) OR (0.2,0.1) in previous assessment
-      tau2[i] <- 1/itau2[i]
-      }
-  
-      for(i in 1:(nvar)) #JS added -1 #MO changed from nI-1
-      {
-      for(t in 1:N)
-      {
-      var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]] 
-      ivar.obs[t,i] <- (cpue_lambda[i]*cpue_lambda[i])/var.obs[t,i]
-      # note total observation error (TOE)
-      TOE[t,i] <- sqrt(var.obs[t,i]) # Total observation variance
-
-      }}
-      ",append=TRUE)
-    }else if(jbinput$jagsdata$nvar != jbinput$jagsdata$nq & jbinput$settings$nran.q == 1){
+    if(jbinput$jagsdata$nvar != jbinput$jagsdata$nq & jbinput$settings$nran.q == 1){
 
       cat("
       # Observation variance
@@ -176,7 +155,28 @@ cat("
 
       ",append=TRUE)
 
-    }
+    }else{
+      cat("
+      # Observation variance
+      for(i in 1:(nvar))  #JS added -1 #MO removed
+      {
+      # Observation error
+      itau2[i]~ dgamma(0.2,0.1)   #These are (0.001,0.001) OR (0.2,0.1) in previous assessment
+      tau2[i] <- 1/itau2[i]
+      }
+  
+      for(i in 1:(nvar)) #JS added -1 #MO changed from nI-1
+      {
+      for(t in 1:N)
+      {
+      var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]] 
+      ivar.obs[t,i] <- (cpue_lambda[i]*cpue_lambda[i])/var.obs[t,i]
+      # note total observation error (TOE)
+      TOE[t,i] <- sqrt(var.obs[t,i]) # Total observation variance
+
+      }}
+      ",append=TRUE)
+      }
     
   }else{ cat("
       # Observation variance
