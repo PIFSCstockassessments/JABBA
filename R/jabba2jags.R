@@ -97,7 +97,7 @@ cat("
            ",append=TRUE)}
   
   if(jbinput$settings$sigma.est==TRUE){
-    if(nsig.off.ind == 0){
+    if(jbinput$settings$nsig.off.ind == 0){
       cat("
       # Observation variance
       for(i in 1:(nvar))  #JS added -1 #MO removed
@@ -120,7 +120,7 @@ cat("
 
       ",append=TRUE)
 
-    }else if(nsig.off.ind == 1){
+    }else if(jbinput$settings$nsig.off.ind == 1){
       cat("
       # Observation variance
       for(i in 1:(nvar))  #JS added -1 #MO removed

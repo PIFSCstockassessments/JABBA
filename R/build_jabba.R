@@ -559,6 +559,7 @@ if(!is.null(rad.prior)){
   jbinput$settings$scenario = scenario
   jbinput$settings$cols = jabba.colors
   jbinput$settings$nran.q = nran.q
+  jbinput$settings$nsig.off.ind = nsig.off.ind
   if(!is.null(index_type)){
       jbinput$settings$index_type = index_type
       
