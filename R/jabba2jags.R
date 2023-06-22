@@ -97,7 +97,7 @@ cat("
            ",append=TRUE)}
   
   if(jbinput$settings$sigma.est==TRUE){
-    if(jbinput$settings$nran.q == 0){
+    if(jbinput$jagsdata$nvar != jbinput$jagsdata$nq & jbinput$settings$nran.q == 0){
       cat("
       # Observation variance
       for(i in 1:(nvar))  #JS added -1 #MO removed
@@ -117,6 +117,11 @@ cat("
       TOE[t,i] <- sqrt(var.obs[t,i]) # Total observation variance
 
       }}
+
+     for(t in 1:N)  #MO added. This is assuming that the last index is the one that obs error is not being estimated for
+      {
+      ivar.obs[t,nq] <- SE2[t,nq]
+      }
       ",append=TRUE)
     }else if(jbinput$jagsdata$nvar != jbinput$jagsdata$nq & jbinput$settings$nran.q == 1){
 
@@ -176,6 +181,28 @@ cat("
 
       ",append=TRUE)
 
+    }else{
+      cat("
+      # Observation variance
+      for(i in 1:(nvar))  #JS added -1 #MO removed
+      {
+      # Observation error
+      itau2[i]~ dgamma(0.2,0.1)   #These are (0.001,0.001) OR (0.2,0.1) in previous assessment
+      tau2[i] <- 1/itau2[i]
+      }
+  
+      for(i in 1:(nvar)) #JS added -1 #MO changed from nI-1
+      {
+      for(t in 1:N)
+      {
+      var.obs[t,i] <- SE2[t,i]+tau2[sets.var[i]] 
+      ivar.obs[t,i] <- (cpue_lambda[i]*cpue_lambda[i])/var.obs[t,i]
+      # note total observation error (TOE)
+      TOE[t,i] <- sqrt(var.obs[t,i]) # Total observation variance
+
+      }}
+
+      ",append=TRUE)
     }
     
   }else{ cat("
@@ -627,6 +654,7 @@ cat("
             fakeTAC <-  TAC
             fakepyrs <- pyrs
             fakenTAC <- nTAC
+            fakenranq <- nran.q
             prHtoHmsy <- 1
             prP <- 1
             prBtoBmsy <- 1
