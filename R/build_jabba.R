@@ -37,6 +37,7 @@
 #' @param sets.q = 1:(ncol(cpue)-1), # assigns catchability q to different CPUE indices. Default is each index a seperate q
 #' @param sigma.est = TRUE, # Estimate additional observation variance
 #' @param sets.var = 1:(ncol(cpue)-1), # estimate individual additional variace
+#' @param nsig.off.ind = 0, column index of the cpue to not estimate obs error, default = 0 to estimate obs error for all cpue
 #' @param fixed.obsE  # Minimum fixed observation error
 #' @param auxiliary.obsE # Fixed observation error for auxiliary data   
 #' @param auxiliary.sigma # TRUE/FALSE 
@@ -93,6 +94,7 @@ build_jabba <- function(
   sets.q = 1:(ncol(cpue)-1), # assigns catchability q to different CPUE indices. Default is each index a seperate q
   sigma.est = TRUE, # Estimate additional observation variance
   sets.var = 1:(ncol(cpue)-1), # estimate individual additional variance
+  nsig.off.ind = 0, #column index of the cpue to not estimate obs error, default = 0 to estimate obs error for all cpue
   fixed.obsE = ifelse(is.null(se),0.1,0.001), # Minimum fixed observation error
   auxiliary.obsE  = ifelse(is.null(auxiliary.se),0.1,0.001),
   auxiliary.sigma = TRUE,
@@ -557,6 +559,7 @@ if(!is.null(rad.prior)){
   jbinput$settings$scenario = scenario
   jbinput$settings$cols = jabba.colors
   jbinput$settings$nran.q = nran.q
+  jbinput$settings$nsig.off.ind = nsig.off.ind
   if(!is.null(index_type)){
       jbinput$settings$index_type = index_type
       
