@@ -2314,8 +2314,6 @@ for(i in 1:n.indices){
            cex=0.9,pt.cex=c(0,5), fill=c('lightgrey', 'navyblue'),density=c(100,18),
            angle=c(0,135),border = c(NA,"navyblue"))
   }
-}
-if(as.png){dev.off()}
-
+  if(as.png){dev.off()}
 
 }
