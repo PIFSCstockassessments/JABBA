@@ -2239,8 +2239,8 @@ jbplot_kobe <-  function(jabba ,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=F
 #' 
 #' @param jabba output list from fit_jabba
 #' @param output.dir directory to save plots
-#' @param ylab yaxis label
-#' @param xlab xaxis label
+#' @param ylab yaxis label, default "Observation Error Variance"
+#' @param xlab xaxis label, default "Year"
 #' @param as.png save as png file of TRUE
 #' @param add if true don't call par() to allow construction of multiplots
 #' @param width plot width
@@ -2251,23 +2251,31 @@ jbplot_TOE <-  function(jabba ,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=FA
 
   if(verbose) cat(paste0("\n","><> jbplot_TOE() - Stacked Observation Error Plot  <><","\n"))
 
-  se <- fit_test$inputseries$se
-  years <- fit_test$yr
-  n.indices <- fit_test$settings$nI
-  posteriors <- fit_test$posteriors
+  se <- jabba$inputseries$se
+  se2 <- se[,-1]^2
+  fixed.obsE <- jabba$settings$sigma.fixed
+  years <- jabba$yr
+  n.indices <- jabba$settings$nI
+  posteriors <- jabba$posteriors
   styr.index = apply(se, 2, function(x) min(which(x>0)) )[2:(1+n.indices)] 
   endyr.index = apply(se, 2, function(x) max(which(x>0)) )[2:(1+n.indices)]
 
+  Par = list(mfrow=c(1,1),mar = c(3.5, 3.5, 0.1, 0.1), mgp =c(2.,0.5,0), tck = -0.02,cex=0.8)
+  if(as.png==TRUE){ png(file = paste0(output.dir,"/Stacked_obsE_",jabba$assessment,"_",jabba$scenario,".png"), width = width, height = height,
+      res = 200, units = "in")}
+  if(add==FALSE) par(Par)
+  if(is.null(ylab)) ylab="Observation Error Variance"
+  if(is.null(xlab)) xlab="Year"
 for(i in 1:n.indices){
 
   plot(1,
-       type="n", ylab= "Observation Error Variance", xlab="Year",
+       type="n", ylab= ylab, xlab=xlab,
        xlim = c(years[styr.index[i]],years[endyr.index[i]]),
-       ylim=c(0,max(c(max(apply(posteriors$TOE,2,mean)))^2,0.08)))
+       ylim=c(0,max(c(max(apply(posteriors$TOE[,,i],2,mean)))^2,0.08)))
     if(fit_test$settings$sigma.est == T){
     polygon(
-      x=c(years, years[styr.index[i]:endyr.index[i]],years[endyr.index[i]]),
-      y=c(0, (apply(posteriors$TOE,2,mean)[styr.index[i]:endyr.index[i]])^2,0),
+      x=c(years[styr.index[i]], years[styr.index[i]:endyr.index[i]],years[endyr.index[i]]),
+      y=c(0, (apply(posteriors$TOE[,,i],2,mean)[styr.index[i]:endyr.index[i]])^2,0),
       col='darkgrey'
     )
     
@@ -2278,8 +2286,9 @@ for(i in 1:n.indices){
   }
 
 }
-  
  ## add se2 (input cpue se ^2 + fixed obs e ^2)
+ #adding 0s for missing values
+  se2[which(is.na(se2[,i])),i] <- 0
   polygon(
     x=c(years[styr.index[i]], years[styr.index[i]:endyr.index[i]],years[endyr.index[i]]),
     y=c(0, se2[styr.index[i]:endyr.index[i],i],0),
