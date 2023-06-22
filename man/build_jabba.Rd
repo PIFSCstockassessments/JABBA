@@ -37,6 +37,7 @@ build_jabba(
   sets.q = 1:(ncol(cpue) - 1),
   sigma.est = TRUE,
   sets.var = 1:(ncol(cpue) - 1),
+  nsig.off.ind = 0,
   fixed.obsE = ifelse(is.null(se), 0.1, 0.001),
   auxiliary.obsE = ifelse(is.null(auxiliary.se), 0.1, 0.001),
   auxiliary.sigma = TRUE,
@@ -126,6 +127,8 @@ VARIANCE options}
 \item{sigma.est}{= TRUE, # Estimate additional observation variance}
 
 \item{sets.var}{= 1:(ncol(cpue)-1), # estimate individual additional variace}
+
+\item{nsig.off.ind}{= 0, column index of the cpue to not estimate obs error, default = 0 to estimate obs error for all cpue}
 
 \item{fixed.obsE}{# Minimum fixed observation error}
 
