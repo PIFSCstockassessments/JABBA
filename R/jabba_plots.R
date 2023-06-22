@@ -2285,8 +2285,7 @@ for(i in 1:n.indices){
            angle=c(0,0,135),border = c(NA,NA,"navyblue"))
   }
 
-}
- ## add se2 (input cpue se ^2 + fixed obs e ^2)
+  ## add se2 (input cpue se ^2 + fixed obs e ^2)
  #adding 0s for missing values
   se2[which(is.na(se2[,i])),i] <- 0
   polygon(
@@ -2314,6 +2313,9 @@ for(i in 1:n.indices){
            cex=0.9,pt.cex=c(0,5), fill=c('lightgrey', 'navyblue'),density=c(100,18),
            angle=c(0,135),border = c(NA,"navyblue"))
   }
+
+}
+ 
   if(as.png){dev.off()}
 
 }
