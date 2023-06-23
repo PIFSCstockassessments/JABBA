@@ -2,10 +2,12 @@
 % Please edit documentation in R/jabba_plots.R
 \name{jbplot_TOE}
 \alias{jbplot_TOE}
-\title{Stacked total observation plot}
+\title{Stacked total observation error plot}
 \usage{
 jbplot_TOE(
   jabba,
+  index = NULL,
+  single.plots = FALSE,
   ylab = NULL,
   xlab = NULL,
   output.dir = getwd(),
@@ -18,6 +20,10 @@ jbplot_TOE(
 }
 \arguments{
 \item{jabba}{output list from fit_jabba}
+
+\item{index}{index to plot}
+
+\item{single.plots}{FALSE, if TRUE will plot individually}
 
 \item{ylab}{yaxis label, default "Observation Error Variance"}
 
@@ -36,5 +42,5 @@ jbplot_TOE(
 \item{verbose}{silent option}
 }
 \description{
-Stacked total observation plot
+Stacked total observation error plot
 }
