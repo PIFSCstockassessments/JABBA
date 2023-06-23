@@ -56,6 +56,29 @@ More detailed examples of JABBA applications to ICCAT stocks can be found in [Ex
 
 An updated vignette is currently under development...
 
+## PIFSC-dev additions 
+
+In `build_jabba()`:  
+*   catch.error - added the option to use a uniform distribution for catch error for the first 55 years of the model, then lognormal distribution is used for the remaining years. To use this options set argument to "deep7".  
+*   catch.adj - argument needed if catch.error = "deep7". Input a vector of the adjustment (up and down) to catch for years of uniform distribution eg c(0.8,1.2)
+*   cpue_lamda - added for data weighting, it takes a vector of weights for the cpue series. If you want to weight all cpue equally, set all to 1
+*   index_type - added to indicate if an absoulte abundance is used for bridging between 2019 BFISH assessment and 2023. If an absolute abundance index is used, set the argument equal to a vector the length of n.cpue.series and indicate either "relative" or "absolute" for each cpue eg c("relative", "absolute"). If you are not using an absolute abundance, can ignore (default is NULL). 
+    *   When you indicate an absolute abundance, inside `build_jabba` function, it will calculate the number of estimated q's (nran.q) as `length(unqiue(sets.q[-abs.ind]))` where abs.ind is the index of cpue that are absolute abundances. This variable is used inside jabba2jags code to set the q priors. If there are fixed q's then it will set the priors differently than if they are all estimated.
+*   rad.prior - if including an absolute abundance index and using a radius prior (for camera survey) include a vector of radius mean and CV
+*   n.grid - needed if using rad.prior, indicate the number of sampling grids in a domain
+*   a.grid - needed if using rad.prior, indicate the area within a sampling grid
+*   s_lambda - needed if using rad.prior, used to indicate uncertainty with BFISH survey 
+*   nsig.off.ind - added to allow estimating observation error for some indices but not others. The argument takes either 0 or 1 (defaults to 0), and this indicates how many indices you don't want to estimate observation error for. Note that it is assumed the index which obsE is not estimated for is the last column in cpue.
+*   n.var - adjust this argument when using nsig.off.ind to indicate how many indices you will be estimating obsE for
+
+`jabba_plots()`:  
+*   jbplot_ppdist - added radius prior/posterior distributions to the plot if they are specified
+*   jbplot_kobe_bfrac - kobe plot with state-dependent reference point (MSST), in `jabba_plots()` can change `statusplot = "bfrac"` to generate this version of kobe plot.
+*   jbplot_TOE - stacked total observation error plot
+
+`jbplot_ppderived()`: 
+*   function to plot prior and posterior distributions of derived quantities (MSY, BMsy, Fmsy, and BmsyK)
+
 **Reference**  
 [Winker, H., Carvalho, F., Kapur, M. (2018) <U>JABBA: Just Another Bayesian Biomass Assessment.</U> *Fisheries 
 Research* **204**: 275-288.](https://www.sciencedirect.com/science/article/pii/S0165783618300845)   

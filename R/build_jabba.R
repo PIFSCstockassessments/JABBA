@@ -37,6 +37,7 @@
 #' @param sets.q = 1:(ncol(cpue)-1), # assigns catchability q to different CPUE indices. Default is each index a seperate q
 #' @param sigma.est = TRUE, # Estimate additional observation variance
 #' @param sets.var = 1:(ncol(cpue)-1), # estimate individual additional variace
+#' @param nsig.off.ind = 0, column index of the cpue to not estimate obs error, default = 0 to estimate obs error for all cpue
 #' @param fixed.obsE  # Minimum fixed observation error
 #' @param auxiliary.obsE # Fixed observation error for auxiliary data   
 #' @param auxiliary.sigma # TRUE/FALSE 
@@ -93,6 +94,7 @@ build_jabba <- function(
   sets.q = 1:(ncol(cpue)-1), # assigns catchability q to different CPUE indices. Default is each index a seperate q
   sigma.est = TRUE, # Estimate additional observation variance
   sets.var = 1:(ncol(cpue)-1), # estimate individual additional variance
+  nsig.off.ind = 0, #column index of the cpue to not estimate obs error, default = 0 to estimate obs error for all cpue
   fixed.obsE = ifelse(is.null(se),0.1,0.001), # Minimum fixed observation error
   auxiliary.obsE  = ifelse(is.null(auxiliary.se),0.1,0.001),
   auxiliary.sigma = TRUE,
@@ -462,6 +464,7 @@ if(!is.null(rad.prior)){
     nq = length(unique(sets.q))
   }else{
     nq = length(unique(sets.q)) #JS subtract 1?
+    nran.q = 0
   }
   
   
@@ -477,7 +480,7 @@ if(!is.null(rad.prior)){
                      params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","Overfishing_ind","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","prOverfishing_ind","TOE", "rad")
   }else{
     surplus.dat = list(N=n.years, TC = TC,I=CPUE,SE2=se2,r.pr=r.pr,psi.pr=psi.pr,K.pr = K.pr,
-                     nq=nq,nI = nI,nvar=nvar,sigma.fixed=ifelse(sigma.proc==TRUE,0,sigma.proc),
+                     nq=nq,nI = nI,nvar=nvar,nran.q=nran.q,sigma.fixed=ifelse(sigma.proc==TRUE,0,sigma.proc),
                      sets.var=sets.var, sets.q=sets.q,cpue_lambda=cpue_lambda,Plim=Plim,slope.HS=slope.HS,
                      nTAC=nTAC,pyrs=pyrs,TAC=TAC,igamma = igamma,stI=stI,pen.P = rep(0,n.years) ,pen.bk = rep(0,n.years),proc.pen=0,K.pen = 0,
                      obs.pen = rep(0,nvar),P_bound=P_bound,q_bounds=q_bounds,sigmaobs_bound=sigmaobs_bound,sigmaproc_bound=sigmaproc_bound,K_bounds=K_bounds,mu.m=m,b.yr=b.yr, b.pr = b.pr)
@@ -555,9 +558,11 @@ if(!is.null(rad.prior)){
   jbinput$settings$assessment = assessment
   jbinput$settings$scenario = scenario
   jbinput$settings$cols = jabba.colors
+  jbinput$settings$nran.q = nran.q
+  jbinput$settings$nsig.off.ind = nsig.off.ind
   if(!is.null(index_type)){
       jbinput$settings$index_type = index_type
-      jbinput$settings$nran.q = nran.q
+      
   }
 
   
