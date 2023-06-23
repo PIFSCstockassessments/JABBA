@@ -2235,87 +2235,150 @@ jbplot_kobe <-  function(jabba ,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=F
 } # End of Kobe plot
 
 
-#' Stacked total observation plot
+#' Stacked total observation error plot
 #' 
 #' @param jabba output list from fit_jabba
-#' @param output.dir directory to save plots
+#' @param index index to plot 
+#' @param single.plots FALSE, if TRUE will plot individually
 #' @param ylab yaxis label, default "Observation Error Variance"
 #' @param xlab xaxis label, default "Year"
+#' @param output.dir directory to save plots
 #' @param as.png save as png file of TRUE
 #' @param add if true don't call par() to allow construction of multiplots
 #' @param width plot width
 #' @param height plot height
 #' @param verbose silent option
 #' @export
-jbplot_TOE <-  function(jabba ,ylab=NULL,xlab=NULL, output.dir=getwd(),as.png=FALSE,add=FALSE,width=5,height=4.5,verbose=TRUE){
-
+jbplot_TOE <-  function(jabba, index=NULL, single.plots = FALSE, ylab=NULL, xlab=NULL, output.dir=getwd(), as.png=FALSE, add=FALSE, width=5, height=4.5, verbose=TRUE){
   if(verbose) cat(paste0("\n","><> jbplot_TOE() - Stacked Observation Error Plot  <><","\n"))
 
   se <- jabba$inputseries$se
   se2 <- se[,-1]^2
   fixed.obsE <- jabba$settings$sigma.fixed
   years <- jabba$yr
-  n.indices <- jabba$settings$nI
+  if(is.null(index)) index = 1:jabba$settings$nq
+  indices = unique(jabba$diags$name)[index]
+  n.indices <- length(indices)
   posteriors <- jabba$posteriors
   styr.index = apply(se, 2, function(x) min(which(x>0)) )[2:(1+n.indices)] 
   endyr.index = apply(se, 2, function(x) max(which(x>0)) )[2:(1+n.indices)]
-
-  Par = list(mfrow=c(1,1),mar = c(3.5, 3.5, 0.1, 0.1), mgp =c(2.,0.5,0), tck = -0.02,cex=0.8)
-  if(as.png==TRUE){ png(file = paste0(output.dir,"/Stacked_obsE_",jabba$assessment,"_",jabba$scenario,".png"), width = width, height = height,
-      res = 200, units = "in")}
-  if(add==FALSE) par(Par)
   if(is.null(ylab)) ylab="Observation Error Variance"
   if(is.null(xlab)) xlab="Year"
-for(i in 1:n.indices){
 
-  plot(1,
+if(single.plots==TRUE){
+      if(is.null(width)) width = 5
+      if(is.null(height)) height = 3.5
+      for(i in 1:n.indices){
+        Par = list(mfrow=c(1,1),mar = c(3.5, 3.5, 0.5, 0.1), mgp =c(2.,0.5,0), tck = -0.02,cex=0.8)
+        if(as.png==TRUE){png(file = paste0(output.dir,"/stacked_TOE_",jabba$assessment,"_",jabba$scenario,"_",indices[i],".png"), width = width, height = height, res = 200, units = "in")}
+        if(!add){
+        if(as.png==TRUE | i==1) par(Par)
+        }
+        plot(1,
        type="n", ylab= ylab, xlab=xlab,
        xlim = c(years[styr.index[i]],years[endyr.index[i]]),
        ylim=c(0,max(c(max(apply(posteriors$TOE[,,i],2,mean)))^2,0.08)))
-    if(fit_test$settings$sigma.est == T){
-    polygon(
-      x=c(years[styr.index[i]], years[styr.index[i]:endyr.index[i]],years[endyr.index[i]]),
-      y=c(0, (apply(posteriors$TOE[,,i],2,mean)[styr.index[i]:endyr.index[i]])^2,0),
-      col='darkgrey'
-    )
-    
-    legend("topleft",c("Estimable Observation Error Variance","Observation Error Variance From CPUE CV", "Fixed Minimal Observation Error Variance"),
-           col=c('darkgrey', 'lightgrey', 'navyblue'),bg='white', pt.lwd=5,
-           cex=1.1,pt.cex=c(0,0,5), fill=c('darkgrey', 'lightgrey', 'navyblue'),density=c(100,100,18),
-           angle=c(0,0,135),border = c(NA,NA,"navyblue"))
-  }
+      if(fit_test$settings$sigma.est == T){
+        polygon(
+          x=c(years[styr.index[i]], years[styr.index[i]:endyr.index[i]],years[endyr.index[i]]),
+          y=c(0, (apply(posteriors$TOE[,,i],2,mean)[styr.index[i]:endyr.index[i]])^2,0),
+          col='darkgrey'
+        )
+        
+        legend("topleft",c("Estimable Observation Error Variance","Observation Error Variance From CPUE CV", "Fixed Minimal Observation Error Variance"),
+              col=c('darkgrey', 'lightgrey', 'navyblue'),bg='white', pt.lwd=5,
+              cex=1.1,pt.cex=c(0,0,5), fill=c('darkgrey', 'lightgrey', 'navyblue'),density=c(100,100,18),
+              angle=c(0,0,135),border = c(NA,NA,"navyblue"))
+      }
 
-  ## add se2 (input cpue se ^2 + fixed obs e ^2)
- #adding 0s for missing values
-  se2[which(is.na(se2[,i])),i] <- 0
-  polygon(
-    x=c(years[styr.index[i]], years[styr.index[i]:endyr.index[i]],years[endyr.index[i]]),
-    y=c(0, se2[styr.index[i]:endyr.index[i],i],0),
-    col='light grey'
-  )
-  
-  ## add fixed obs error [white]
-  polygon(
-    x=c(years[styr.index[i]],years[styr.index[i]] , years[endyr.index[i]],years[endyr.index[i]]),
-    y=c(0,fixed.obsE^2,fixed.obsE^2,0),
-    col='white'
-  )
-  
-  ## add fixed obs error [blue shading]
-  polygon(
-    x=c(years[styr.index[i]],years[styr.index[i]] , years[endyr.index[i]],years[endyr.index[i]]),
-    y=c(0,fixed.obsE^2,fixed.obsE^2,0),
-    col='navyblue',angle=135, lwd=5, density=12,fillOddEven = F
-  )
-  if(fit_test$settings$sigma.est == F){
-    legend("topleft",c("Observation Error Variance From CPUE CV", "Fixed Minimal Observation Error Variance"),
-           col=c('lightgrey', 'navyblue'),bg='white', pt.lwd=5, 
-           cex=0.9,pt.cex=c(0,5), fill=c('lightgrey', 'navyblue'),density=c(100,18),
-           angle=c(0,135),border = c(NA,"navyblue"))
-  }
+      ## add se2 (input cpue se ^2 + fixed obs e ^2)
+    #adding 0s for missing values
+      se2[which(is.na(se2[,i])),i] <- 0
+      polygon(
+        x=c(years[styr.index[i]], years[styr.index[i]:endyr.index[i]],years[endyr.index[i]]),
+        y=c(0, se2[styr.index[i]:endyr.index[i],i],0),
+        col='light grey'
+      )
+      
+      ## add fixed obs error [white]
+      polygon(
+        x=c(years[styr.index[i]],years[styr.index[i]] , years[endyr.index[i]],years[endyr.index[i]]),
+        y=c(0,fixed.obsE^2,fixed.obsE^2,0),
+        col='white'
+      )
+      
+      ## add fixed obs error [blue shading]
+      polygon(
+        x=c(years[styr.index[i]],years[styr.index[i]] , years[endyr.index[i]],years[endyr.index[i]]),
+        y=c(0,fixed.obsE^2,fixed.obsE^2,0),
+        col='navyblue',angle=135, lwd=5, density=12,fillOddEven = F
+      )
+      if(fit_test$settings$sigma.est == F){
+        legend("topleft",c("Observation Error Variance From CPUE CV", "Fixed Minimal Observation Error Variance"),
+              col=c('lightgrey', 'navyblue'),bg='white', pt.lwd=5, 
+              cex=0.9,pt.cex=c(0,5), fill=c('lightgrey', 'navyblue'),density=c(100,18),
+              angle=c(0,135),border = c(NA,"navyblue"))
+      }
+      if(as.png==TRUE){dev.off()}
 
-}
- 
-  if(as.png){dev.off()}
+      } #end of forloop
+      }else{ #for multiple plots
+      if(is.null(width)) width = 7
+      if(is.null(height)) height = ifelse(n.indices==1,5,ifelse(n.indices==2,3.,2.5))*round(n.indices/2+0.01,0)
+      Par = list(mfrow=c(round(n.indices/2+0.01,0),ifelse(n.indices==1,1,2)),mai=c(0.35,0.15,0,.15),omi = c(0.2,0.25,0.2,0) + 0.1,mgp=c(2,0.5,0), tck = -0.02,cex=0.8)
+      if(as.png==TRUE){png(file = paste0(output.dir,"/stacked_TOE_",jabba$assessment,"_",jabba$scenario,".png"), width = 7, height = ifelse(n.indices==1,5,ifelse(n.indices==2,3.,2.5))*round(n.indices/2+0.01,0),
+                            res = 200, units = "in")}
+      if(!add) par(Par)
+      for(i in 1:n.indices){
+          
+      plot(1,
+          type="n", ylab= ylab, xlab=xlab,
+          xlim = c(years[styr.index[i]],years[endyr.index[i]]),
+          ylim=c(0,max(c(max(apply(posteriors$TOE[,,i],2,mean)))^2,0.08)))
+        if(fit_test$settings$sigma.est == T){
+        polygon(
+          x=c(years[styr.index[i]], years[styr.index[i]:endyr.index[i]],years[endyr.index[i]]),
+          y=c(0, (apply(posteriors$TOE[,,i],2,mean)[styr.index[i]:endyr.index[i]])^2,0),
+          col='darkgrey'
+        )
+        
+        legend("topleft",c("Estimable Observation Error Variance","Observation Error Variance From CPUE CV", "Fixed Minimal Observation Error Variance"),
+              col=c('darkgrey', 'lightgrey', 'navyblue'),bg='white', pt.lwd=5,
+              cex=1.1,pt.cex=c(0,0,5), fill=c('darkgrey', 'lightgrey', 'navyblue'),density=c(100,100,18),
+              angle=c(0,0,135),border = c(NA,NA,"navyblue"))
+      }
+
+      ## add se2 (input cpue se ^2 + fixed obs e ^2)
+    #adding 0s for missing values
+      se2[which(is.na(se2[,i])),i] <- 0
+      polygon(
+        x=c(years[styr.index[i]], years[styr.index[i]:endyr.index[i]],years[endyr.index[i]]),
+        y=c(0, se2[styr.index[i]:endyr.index[i],i],0),
+        col='light grey'
+      )
+      
+      ## add fixed obs error [white]
+      polygon(
+        x=c(years[styr.index[i]],years[styr.index[i]] , years[endyr.index[i]],years[endyr.index[i]]),
+        y=c(0,fixed.obsE^2,fixed.obsE^2,0),
+        col='white'
+      )
+      
+      ## add fixed obs error [blue shading]
+      polygon(
+        x=c(years[styr.index[i]],years[styr.index[i]] , years[endyr.index[i]],years[endyr.index[i]]),
+        y=c(0,fixed.obsE^2,fixed.obsE^2,0),
+        col='navyblue',angle=135, lwd=5, density=12,fillOddEven = F
+      )
+      if(fit_test$settings$sigma.est == F){
+        legend("topleft",c("Observation Error Variance From CPUE CV", "Fixed Minimal Observation Error Variance"),
+              col=c('lightgrey', 'navyblue'),bg='white', pt.lwd=5, 
+              cex=0.9,pt.cex=c(0,5), fill=c('lightgrey', 'navyblue'),density=c(100,18),
+              angle=c(0,135),border = c(NA,"navyblue"))
+      }
+
+    }
+    if(as.png){dev.off()}
+      }    
 
 }
