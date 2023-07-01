@@ -2253,7 +2253,7 @@ jbplot_TOE <-  function(jabba, index=NULL, single.plots = FALSE, ylab=NULL, xlab
   if(verbose) cat(paste0("\n","><> jbplot_TOE() - Stacked Observation Error Plot  <><","\n"))
 
   se <- jabba$inputseries$se
-  se2 <- se[,-1]^2
+  se2 <- as.data.frame(se[,-1]^2)
   fixed.obsE <- jabba$settings$sigma.fixed
   years <- jabba$yr
   if(is.null(index)) index = 1:jabba$settings$nq
