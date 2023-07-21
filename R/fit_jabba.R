@@ -99,8 +99,8 @@ fit_jabba = function(jbinput,
     inits = function(){
       list(K= rlnorm(1,log(jbd$K.pr[1])-0.5*0.3^2,0.3),
            r = rlnorm(1,log(jbd$r.pr[1]),jbd$r.pr[2]) ,
-         # q = pmin(pmax(qbound[1]*1.05,runif(jbd$nq,min(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T),mean(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T))),qbound[2]*0.95), #[1],NA), #JS added [1] and concat NA here
-           q = c(runif(jbd$nran.q,10e-10,10),rep(NA, jbd$nq-jbd$nran.q)), #MO added
+          q = pmin(pmax(qbound[1]*1.05,runif(jbd$nq,min(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T),mean(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T))),qbound[2]*0.95), #[1],NA), #JS added [1] and concat NA here
+          # q = c(runif(jbd$nran.q,10e-10,10),rep(NA, jbd$nq-jbd$nran.q)), #MO added
            psi=rbeta(1,ab[1],ab[2]),
          isigma2.est=runif(1,20,100), 
          itau2=runif(jbd$nvar,80,200),
@@ -110,8 +110,8 @@ fit_jabba = function(jbinput,
     inits = function(){
       list(K= rlnorm(1,log(jbd$K.pr[1])-0.5*0.3^2,0.3),
            r = rlnorm(1,log(jbd$r.pr[1]),jbd$r.pr[2]) ,
-           q = runif(jbd$nq,10e-10,10),
-           #q = pmin(pmax(qbound[1]*1.05,runif(jbd$nq,min(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T),mean(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T))),qbound[2]*0.95), 
+           #q = runif(jbd$nq,10e-10,10),
+           q = pmin(pmax(qbound[1]*1.05,runif(jbd$nq,min(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T),mean(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T))),qbound[2]*0.95), 
            psi=rbeta(1,ab[1],ab[2]),
            isigma2.est=runif(1,20,100), 
            itau2=runif(jbd$nvar,80,200))
