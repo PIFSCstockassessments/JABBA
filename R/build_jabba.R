@@ -113,7 +113,7 @@ build_jabba <- function(
   P_bound = c(0.02,3.0),  # Soft penalty bounds for b/k c(0.02,1.3)
   sigmaobs_bound = 1, # Adds an upper bound to the observation variance
   sigmaproc_bound = 0.2, # Adds an upper bound to the process variance
-  q_bounds= c(10^-30,1000), # Defines lower and upper bounds for q
+  q_bounds= c(10^-5,10000), # Defines lower and upper bounds for q
   K_bounds= c(0.01,10^10), # Defines lower and upper bounds for K
   qA_bounds = c(10^-30,1000), # Defines lower and upper bounds for q of auxiliary data type "effort"
   # Settings
