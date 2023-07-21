@@ -110,7 +110,7 @@ build_jabba <- function(
   imp.yr = NULL, # default last year plus ONE
   pyrs = NULL, # Set number of projections years
   # Penalties
-  P_bound = c(0.02,1.3),  # Soft penalty bounds for b/k
+  P_bound = c(0.02,3.0),  # Soft penalty bounds for b/k c(0.02,1.3)
   sigmaobs_bound = 1, # Adds an upper bound to the observation variance
   sigmaproc_bound = 0.2, # Adds an upper bound to the process variance
   q_bounds= c(10^-30,1000), # Defines lower and upper bounds for q
