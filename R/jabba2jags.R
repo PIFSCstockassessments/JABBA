@@ -52,6 +52,9 @@ cat("
     # Process variance prior
     isigma2.est ~ dgamma(igamma[1],igamma[2])
 
+    #AR1 prior
+    phi ~ dnorm(0,pow(1.0,-2))
+
     # Carrying Capacity SB0
     K ~ dlnorm(log(K.pr[1]),pow(K.pr[2], -2))
 
@@ -220,6 +223,7 @@ cat("
     P[1] ~ dlnorm(Pmean[1],iPV[1]) # set to small noise instead of isigma2
     penB[1]  <- ifelse(P[1]<P_bound[1],log(K*P[1])-log(K*P_bound[1]),ifelse(P[1]>P_bound[2],log(K*P[1])-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass
     penBK[1] <- 0
+    proc[1]<- dlnorm(0,iPV[1])
 
     # Process equation
     for (t in 2:(N+1))
@@ -228,7 +232,8 @@ cat("
     log(max(P[t-1] +  r/(m-1)*P[t-1]*(1-pow(P[t-1],m-1)) - estC[t-1]/K,0.001)),
     log(max(P[t-1] +  r/(m-1)*P[t-1]*(1-pow(P[t-1],m-1))*P[t-1]*slope.HS - estC[t-1]/K,0.001)))
     iPV[t] <- ifelse(t<(stI),10000,isigma2) # inverse process variance
-    P[t] ~ dlnorm(Pmean[t],iPV[t])
+    proc[t]<-proc[t-1]*phi + dlnorm(0,iPV[t])
+    P[t] ~ dlnorm(Pmean[t],proc[t])
     }
     for (t in 2:N)
     {
