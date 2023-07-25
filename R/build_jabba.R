@@ -103,7 +103,7 @@ build_jabba <- function(
   sets.varA = 1:(ncol(auxiliary)-1), # estimate individual additional variance
   sigma.proc =  TRUE, # TRUE: Estimate observation error, else set to value
   proc.dev.all = TRUE, # TRUE: All year, year = starting year
-  igamma = c(4,0.01), # informative mean 0.05, CV 0.4 from original paper
+  igamma = c(0.001,0.001), # informative mean 0.05, CV 0.4 from original paper  c(4,0.01)
   projection = FALSE, # Switch on by Projection = TRUE
   TACs = NULL, # vector of fixed catches used for projections  
   TACint =  NULL, # default avg last 3 years
@@ -112,7 +112,7 @@ build_jabba <- function(
   # Penalties
   P_bound = c(0.02,1.3),  # Soft penalty bounds for b/k c(0.02,1.3)
   sigmaobs_bound = 1, # Adds an upper bound to the observation variance
-  sigmaproc_bound = 0.01, # Adds an upper bound to the process variance
+  sigmaproc_bound = 0.05, # Adds an upper bound to the process variance
   q_bounds= c(10^-30,1000), # Defines lower and upper bounds for q
   K_bounds= c(0.01,10^10), # Defines lower and upper bounds for K
   qA_bounds = c(10^-30,1000), # Defines lower and upper bounds for q of auxiliary data type "effort"
