@@ -105,7 +105,7 @@ fit_jabba = function(jbinput,
          isigma2.est=runif(1,20,100), 
          itau2=runif(jbd$nvar,80,200),
          rad = runif(1, 10, 60),
-         phi=runif(1,0,1))
+         phi=runif(1,-1,1))
       }
   } else if(init.values==FALSE){
     inits = function(){
@@ -116,7 +116,7 @@ fit_jabba = function(jbinput,
            psi=rbeta(1,ab[1],ab[2]),
            isigma2.est=runif(1,20,100), 
            itau2=runif(jbd$nvar,80,200),
-           phi=runif(1,0,1))
+           phi=runif(1,-1,1))
       }   
   }else {
     
