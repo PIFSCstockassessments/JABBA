@@ -223,7 +223,7 @@ cat("
     P[1] ~ dlnorm(Pmean[1],iPV[1]) # set to small noise instead of isigma2
     penB[1]  <- ifelse(P[1]<P_bound[1],log(K*P[1])-log(K*P_bound[1]),ifelse(P[1]>P_bound[2],log(K*P[1])-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass
     penBK[1] <- 0
-    proc[1] ~ dlnorm(,iPV[1])
+    proc[1] ~ dlnorm(0,iPV[1])
 
     # Process equation
     for (t in 2:(N+1))
