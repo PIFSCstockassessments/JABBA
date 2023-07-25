@@ -232,7 +232,8 @@ cat("
     log(max(P[t-1] +  r/(m-1)*P[t-1]*(1-pow(P[t-1],m-1)) - estC[t-1]/K,0.001)),
     log(max(P[t-1] +  r/(m-1)*P[t-1]*(1-pow(P[t-1],m-1))*P[t-1]*slope.HS - estC[t-1]/K,0.001)))
     iPV[t] <- ifelse(t<(stI),10000,isigma2) # inverse process variance
-    proc[t]<-proc[t-1]*phi + dlnorm(0,iPV[t])
+    delta_y <- dlnorm(0,iPV[t])
+    proc[t]<-proc[t-1]*phi + delta_y
     P[t] ~ dlnorm(Pmean[t],proc[t])
     }
     for (t in 2:N)
