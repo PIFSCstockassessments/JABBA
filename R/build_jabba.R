@@ -103,7 +103,7 @@ build_jabba <- function(
   sets.varA = 1:(ncol(auxiliary)-1), # estimate individual additional variance
   sigma.proc =  TRUE, # TRUE: Estimate observation error, else set to value
   proc.dev.all = TRUE, # TRUE: All year, year = starting year
-  igamma = c(0.001,0.001), # informative mean 0.05, CV 0.4 from original paper  c(4,0.01)
+  igamma = c(4,0.01), # informative mean 0.05, CV 0.4 from original paper  c(4,0.01)
   projection = FALSE, # Switch on by Projection = TRUE
   TACs = NULL, # vector of fixed catches used for projections  
   TACint =  NULL, # default avg last 3 years
