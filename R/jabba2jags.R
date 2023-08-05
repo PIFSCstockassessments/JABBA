@@ -224,8 +224,9 @@ cat("
     penB[1]  <- ifelse(P[1]<P_bound[1],log(K*P[1])-log(K*P_bound[1]),ifelse(P[1]>P_bound[2],log(K*P[1])-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass
     penBK[1] <- 0
 
-    var.proc[1] <- log(pow(sigma2/Pmean[1],2)+1)
+    var.proc[1] <- log(pow(sigma/Pmean[1],2)+1)
     proc[1] ~ dnorm(0,pow(var.proc[1],-2))
+    delta_y[1] <- proc[1]
 
     # Process equation
     for (t in 2:(N+1))
@@ -235,7 +236,7 @@ cat("
     log(max(P[t-1] +  r/(m-1)*P[t-1]*(1-pow(P[t-1],m-1))*P[t-1]*slope.HS - estC[t-1]/K,0.001)))
     iPV[t] <- ifelse(t<(stI),10000,isigma2) # inverse process variance
 
-    var.proc[t] <- log(pow(sigma2/Pmean[t],2)+1)
+    var.proc[t] <- log(pow(sigma/Pmean[t],2)+1)
     delta_y[t] ~ dnorm(0,pow(var.proc[t],-2))
     proc[t]<- proc[t-1]*phi + delta_y[t]
     P[t] ~ dlnorm(Pmean[t],pow(proc[t],-2))
