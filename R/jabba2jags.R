@@ -244,9 +244,9 @@ cat("
     }
 
 
-   P.mean1 <- Pmean[1:N]   ##JS added jags is particular about indexing so had to add these
-   P <- P.mean2.base[1:N]  ##JS added jags is particular about indexing so had to add these
-   log.resid<-log.resid.base[1:N]  ##JS added jags is particular about indexing so had to add these
+  # P.mean1 <- Pmean[1:N]   ##JS added jags is particular about indexing so had to add these
+  # P <- P.mean2.base[1:N]  ##JS added jags is particular about indexing so had to add these
+  # log.resid<-log.resid.base[1:N]  ##JS added jags is particular about indexing so had to add these
 
 
 
