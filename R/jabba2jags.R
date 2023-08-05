@@ -216,9 +216,9 @@ cat("
 
     #Process equation base prediction
     Pmean[1] <- log(psi) 
-  
+    P_one <- Pmean[1]
 
-   # penB[1]  <- ifelse(P[1]<P_bound[1],log(K*P[1])-log(K*P_bound[1]),ifelse(P[1]>P_bound[2],log(K*P[1])-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass - now included below
+    penB[1]  <- ifelse(P_one<P_bound[1],log(K*P_one)-log(K*P_bound[1]),ifelse(P_one>P_bound[2],log(K*P_one)-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass 
     penBK[1] <- 0
 
     # Process equation base prediction
@@ -256,7 +256,7 @@ cat("
     tau.red <- isigma2 * (1-phi*phi)  #this is precision of total biomass variation that includes white noise and correlated error
     sigma.red <- 1 / sqrt(tau.red)
     
-    for (t in 1:N)
+    for (t in 2:N)
     {
     penB[t]  <- ifelse(P[t]<(P_bound[1]),log(K*P[t])-log(K*(P_bound[1])),ifelse(P[t]>P_bound[2],log(K*P[t])-log(K*(P_bound[2])),0)) # penalty if Pmean is outside viable biomass
     # Depletion prior
