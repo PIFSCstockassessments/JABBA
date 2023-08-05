@@ -226,7 +226,6 @@ cat("
 
     var.proc[1] <- log(pow(sigma/Pmean[1],2)+1)
     proc[1] ~ dnorm(0,pow(var.proc[1],-2))
-    delta_y[1] <- proc[1]
 
     # Process equation
     for (t in 2:(N+1))
