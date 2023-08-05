@@ -275,7 +275,7 @@ cat("
 
     # Process error deviation
     for(t in 1:N){
-    Proc.Dev[t] <- log(P[t]*K)-log(exp(Pmean[t])*K)}
+    Proc.Dev[t] <- log(P.mean2.base[t]*K)-log(exp(Pmean[t])*K)}
 
     # Enforce soft penalties on bounds for P
     for(t in 1:N){
@@ -300,7 +300,7 @@ cat("
     
     for (t in 1:(N+1)) # One step ahead biomass
     {
-    SB[t] <- K*P[t]
+    SB[t] <- K*P.mean2.base[t]
     BtoBmsy[t] <- SB[t]/SBmsy
     }
 
@@ -322,7 +322,7 @@ cat("
     {
     for (t in 1:N)
     {
-    Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
+    Imean[t,i] <- log(q[sets.q[i]]*P.mean2.base[t]*K);
     I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
     CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
     Ihat[t,i]  <- exp(Imean[t,i])
@@ -333,10 +333,10 @@ cat("
       ## added for BFISH index
       for (t in 1:N){ 
         
-        Imean[t,2] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+        Imean[t,2] <- log(P.mean2.base[t] * K/((q[sets.q[nq]])*n.grid))
         survey_precision[t] <- (s_lambda*s_lambda)/((ivar.obs[t,2]))  #( ivar.obs[t,2]) #MO changed SE2 to ivar.obs
         I[t, 2] ~ dlnorm(Imean[t,2], survey_precision[t])
-        CPUE[t,2] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+        CPUE[t,2] <- P.mean2.base[t]*K/(q[sets.q[nq]]*n.grid)
         Ihat[t,2]  <- exp(Imean[t,2])
 
         }
@@ -348,10 +348,10 @@ cat("
       ## added for BFISH index
       for (t in 1:N){ 
         
-        Imean[t,3] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+        Imean[t,3] <- log(PP.mean2.base[t] * K/((q[sets.q[nq]])*n.grid))
         survey_precision[t] <- (s_lambda*s_lambda)/((ivar.obs[t,3]))  #( ivar.obs[t,3])
         I[t, 3] ~ dlnorm(Imean[t,3], survey_precision[t])
-        CPUE[t,3] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+        CPUE[t,3] <- P.mean2.base[t]*K/(q[sets.q[nq]]*n.grid)
         Ihat[t,3]  <- exp(Imean[t,3])
 
         }
@@ -366,7 +366,7 @@ cat("
     {
     for (t in 1:N)
     {
-    Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
+    Imean[t,i] <- log(q[sets.q[i]]*P.mean2.base[t]*K);
     I[t,i] ~ dlnorm(Imean[t,i],ivar.obs[t,i]);
     CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
     Ihat[t,i]  <- exp(Imean[t,i])
@@ -387,7 +387,7 @@ cat("
               {
               for (t in 1:N)
               {
-              Imean[t,i] <- log(pow(P[1],-1)*P[t]);
+              Imean[t,i] <- log(pow(P.mean2.base[1],-1)*P.mean2.base[t]);
               I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
               CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
               Ihat[t,i]  <- exp(Imean[t,i])
@@ -401,10 +401,10 @@ cat("
           ## added for BFISH index
               for (t in 1:N){ 
               
-              Imean[t,2] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+              Imean[t,2] <- log(P.mean2.base[t] * K/((q[sets.q[nq]])*n.grid))
               survey_precision[t] <- (s_lambda*s_lambda)/(SE2[t,2])  #( ivar.obs[t,2]) #JS deleted sqrt of SE2
               I[t, 2] ~ dlnorm(Imean[t,2], survey_precision[t])
-              CPUE[t,2] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+              CPUE[t,2] <- P.mean2.base[t]*K/(q[sets.q[nq]]*n.grid)
               Ihat[t,2]  <- exp(Imean[t,2])
 
               }
@@ -418,10 +418,10 @@ cat("
              ## added for BFISH index
               for (t in 1:N){ 
               
-              Imean[t,3] <- log(P[t] * K/((q[sets.q[nq]])*n.grid))
+              Imean[t,3] <- log(P.mean2.base[t] * K/((q[sets.q[nq]])*n.grid))
               survey_precision[t] <- (s_lambda*s_lambda)/(SE2[t,3])  #( ivar.obs[t,3]) #JS deleted sqrt of SE2
               I[t, 3] ~ dlnorm(Imean[t,3], survey_precision[t])
-              CPUE[t,3] <- P[t]*K/(q[sets.q[nq]]*n.grid)
+              CPUE[t,3] <- P.mean2.base[t]*K/(q[sets.q[nq]]*n.grid)
               Ihat[t,3]  <- exp(Imean[t,3])
 
               }
@@ -438,7 +438,7 @@ cat("
             {
             for (t in 1:N)
             {
-            Imean[t,i] <- log(pow(P[1],-1)*P[t]);
+            Imean[t,i] <- log(pow(P.mean2.base[1],-1)*P.mean2.base[t]);
             I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
             CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
             Ihat[t,i]  <- exp(Imean[t,i])
