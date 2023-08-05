@@ -236,8 +236,8 @@ cat("
     iPV[t] <- ifelse(t<(stI),10000,isigma2) # inverse process variance
 
     var.proc[t] <- log(pow(sigma2/Pmean[t],2)+1)
-    delta_y ~ dnorm(0,pow(var.proc[t],-2))
-    proc[t]<- proc[t-1]*phi + delta_y
+    delta_y[t] ~ dnorm(0,pow(var.proc[t],-2))
+    proc[t]<- proc[t-1]*phi + delta_y[t]
     P[t] ~ dlnorm(Pmean[t],pow(proc[t],-2))
     }
     for (t in 2:N)
