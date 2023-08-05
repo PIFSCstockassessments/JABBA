@@ -216,9 +216,8 @@ cat("
 
     #Process equation base prediction
     Pmean[1] <- log(psi) 
-    P_one <- Pmean[1]
 
-    penB[1]  <- ifelse(P_one<P_bound[1],log(K*P_one)-log(K*P_bound[1]),ifelse(P_one>P_bound[2],log(K*P_one)-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass 
+    penB[1]  <- ifelse( P.mean2.base[1]<P_bound[1],log(K* P.mean2.base[1])-log(K*P_bound[1]),ifelse( P.mean2.base[1]>P_bound[2],log(K* P.mean2.base[1])-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass 
     penBK[1] <- 0
 
     # Process equation base prediction
@@ -258,9 +257,9 @@ cat("
     
     for (t in 2:N)
     {
-    penB[t]  <- ifelse(P[t]<(P_bound[1]),log(K*P[t])-log(K*(P_bound[1])),ifelse(P[t]>P_bound[2],log(K*P[t])-log(K*(P_bound[2])),0)) # penalty if Pmean is outside viable biomass
+    penB[t]  <- ifelse(P.mean2.base[t]<(P_bound[1]),log(K*P.mean2.base[t])-log(K*(P_bound[1])),ifelse(P.mean2.base[t]>P_bound[2],log(K*P.mean2.base[t])-log(K*(P_bound[2])),0)) # penalty if Pmean is outside viable biomass
     # Depletion prior
-    penBK[t] <- ifelse(b.yr[t] < 1,0,log(ifelse(b.pr[4]<1,P[t],ifelse(b.pr[4]>1,HtoHmsy[t],BtoBmsy[t])))-log(b.pr[1]))
+    penBK[t] <- ifelse(b.yr[t] < 1,0,log(ifelse(b.pr[4]<1,P.mean2.base[t],ifelse(b.pr[4]>1,HtoHmsy[t],BtoBmsy[t])))-log(b.pr[1]))
     }
 
 
