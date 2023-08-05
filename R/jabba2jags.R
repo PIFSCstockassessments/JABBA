@@ -231,7 +231,7 @@ cat("
    #Initialize uncorrelated residuals
    for (t in 1:(N+1))
     {
-   P.base <- dlnorm(P.mean2.base,isigma2)   
+   P.base[t] <- dlnorm(P.mean2.base,isigma2)   
    log.resid.base[t]<-log(P.base[t]-log(Pmean[t]))
     }
 
