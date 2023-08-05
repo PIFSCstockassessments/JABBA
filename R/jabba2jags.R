@@ -224,9 +224,9 @@ cat("
     # Process equation base prediction
     for (t in 2:(N+1))
     {
-    Pmean[t] <- ifelse(P[t-1] > Plim,
-    log(max(P[t-1] +  r/(m-1)*P[t-1]*(1-pow(P[t-1],m-1)) - estC[t-1]/K,0.001)),
-    log(max(P[t-1] +  r/(m-1)*P[t-1]*(1-pow(P[t-1],m-1))*P[t-1]*slope.HS - estC[t-1]/K,0.001)))
+    Pmean[t] <- ifelse(Pmean[t-1] > Plim,
+    log(max(Pmean[t-1] +  r/(m-1)*Pmean[t-1]*(1-pow(Pmean[t-1],m-1)) - estC[t-1]/K,0.001)),
+    log(max(Pmean[t-1] +  r/(m-1)*Pmean[t-1]*(1-pow(Pmean[t-1],m-1))*Pmean[t-1]*slope.HS - estC[t-1]/K,0.001)))
     }
 
    #Initialize uncorrelated residuals
@@ -246,7 +246,7 @@ cat("
 
 
    P.mean1 <- Pmean[1:N]   ##JS added jags is particular about indexing so had to add these
-   P.mean2 <- P.mean2.base[1:N]  ##JS added jags is particular about indexing so had to add these
+   P <- P.mean2.base[1:N]  ##JS added jags is particular about indexing so had to add these
    log.resid<-log.resid.base[1:N]  ##JS added jags is particular about indexing so had to add these
 
 
@@ -276,9 +276,7 @@ cat("
 
     # Process error deviation
     for(t in 1:N){
-    Proc.Dev[t] <- log(P.mean2.base[t]*K)-log(exp(Pmean[t])*K)}
-
-  #  Proc.Dev[t] <- log(P[t]*K)-log(exp(Pmean[t])*K)}
+    Proc.Dev[t] <- log(P[t]*K)-log(exp(Pmean[t])*K)}
 
     # Enforce soft penalties on bounds for P
     for(t in 1:N){
