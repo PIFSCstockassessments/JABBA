@@ -214,22 +214,48 @@ cat("
 ",append=TRUE)}  
   cat("
 
-    #Process equation
-    Pmean[1] <- log(psi)
-    iPV[1] <- ifelse(1<(stI),10000,isigma2) # inverse process variance
-    P[1] ~ dlnorm(Pmean[1],iPV[1]) # set to small noise instead of isigma2
+    #Process equation base prediction
+    Pmean[1] <- log(psi) 
+  
+
     penB[1]  <- ifelse(P[1]<P_bound[1],log(K*P[1])-log(K*P_bound[1]),ifelse(P[1]>P_bound[2],log(K*P[1])-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass
     penBK[1] <- 0
 
-    # Process equation
+    # Process equation base prediction
     for (t in 2:(N+1))
     {
     Pmean[t] <- ifelse(P[t-1] > Plim,
     log(max(P[t-1] +  r/(m-1)*P[t-1]*(1-pow(P[t-1],m-1)) - estC[t-1]/K,0.001)),
     log(max(P[t-1] +  r/(m-1)*P[t-1]*(1-pow(P[t-1],m-1))*P[t-1]*slope.HS - estC[t-1]/K,0.001)))
-    iPV[t] <- ifelse(t<(stI),10000,isigma2) # inverse process variance
-    P[t] ~ dlnorm(Pmean[t],iPV[t])
     }
+
+   #Initialize uncorrelated residuals
+   for (t in 1:(N+1))
+    {
+   P.base <- dlnorm(P.mean2.base,isigma2)   
+   log.resid.base[t]<-log(P.base[t]-log(Pmean[t]))
+    }
+
+   #Initialize prediction that accounts for autocorrelation
+    P.mean2.base[1]<-Pmean[1] + phi * log.resid.0
+   
+    for (t in 2:(N+1))
+    {
+    P.mean2.base[t] <- Pmean[t] + phi * log.resid.base[t-1]
+    }
+
+
+   P.mean1 <- Pmean[1:N]   ##JS added jags is particular about indexing so had to add these
+   P.mean2 <- P.mean2.base[1:N]  ##JS added jags is particular about indexing so had to add these
+   log.resid<-log.resid.base[1:N]  ##JS added jags is particular about indexing so had to add these
+
+
+
+    phi ~ dnorm(0,1.0E-4) I(-1,1)   #serial autocorrelation coefficient  
+    log.resid.0 ~ dnorm(0,tau.red) T(-5,5)
+    tau.red <- isigma * (1-phi*phi)  #this is precision of total biomass variation that includes white noise and correlated error
+    sigma.red <- 1 / sqrt(tau.red)
+    
     for (t in 2:N)
     {
     penB[t]  <- ifelse(P[t]<(P_bound[1]),log(K*P[t])-log(K*(P_bound[1])),ifelse(P[t]>P_bound[2],log(K*P[t])-log(K*(P_bound[2])),0)) # penalty if Pmean is outside viable biomass
@@ -238,10 +264,21 @@ cat("
     }
 
 
+   #Previous process error incorporation
+   # iPV[1] <- ifelse(1<(stI),10000,isigma2) # inverse process variance
+   # P[1] ~ dlnorm(Pmean[1],iPV[1]) # set to small noise instead of isigma2
+    
+
+   # iPV[t] <- ifelse(t<(stI),10000,isigma2) # inverse process variance
+   # P[t] ~ dlnorm(Pmean[t],iPV[t])
+
+
 
     # Process error deviation
     for(t in 1:N){
-    Proc.Dev[t] <- log(P[t]*K)-log(exp(Pmean[t])*K)}
+    Proc.Dev[t] <- log(P.mean2.base[t]*K)-log(exp(Pmean[t])*K)}
+
+  #  Proc.Dev[t] <- log(P[t]*K)-log(exp(Pmean[t])*K)}
 
     # Enforce soft penalties on bounds for P
     for(t in 1:N){
