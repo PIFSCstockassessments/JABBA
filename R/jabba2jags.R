@@ -218,7 +218,7 @@ cat("
     Pmean[1] <- log(psi) 
 
    # penB[1]  <- ifelse( P.mean2.base[1]<P_bound[1],log(K* P.mean2.base[1])-log(K*P_bound[1]),ifelse( P.mean2.base[1]>P_bound[2],log(K* P.mean2.base[1])-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass 
-    penBK[1] <- 0
+  #  penBK[1] <- 0
 
     # Process equation base prediction
     for (t in 2:(N+1))
@@ -278,10 +278,10 @@ cat("
     Proc.Dev[t] <- log(P.mean2.base[t]*K)-log(exp(Pmean[t])*K)}
 
     # Enforce soft penalties on bounds for P
-    for(t in 1:N){
-    pen.P[t] ~ dnorm(penB[t],1000) # enforce penalty with CV = 0.1
-    pen.bk[t] ~ dnorm(penBK[t],pow(b.pr[2],-2))
-    }
+  #  for(t in 1:N){
+  #  pen.P[t] ~ dnorm(penB[t],1000) # enforce penalty with CV = 0.1
+  #  pen.bk[t] ~ dnorm(penBK[t],pow(b.pr[2],-2))
+   # }
 
     Hmsy <- r*pow(m-1,-1)*(1-1/m)
     SBmsy_K <- (m)^(-1/(m-1))
