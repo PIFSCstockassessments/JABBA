@@ -104,7 +104,9 @@ fit_jabba = function(jbinput,
            psi=rbeta(1,ab[1],ab[2]),
          isigma2.est=runif(1,20,100), 
          itau2=runif(jbd$nvar,80,200),
-         rad = runif(1, 10, 60))
+         rad = runif(1, 10, 60),
+         phi.frs=0,
+         FRS_resid.0 = 0)
       }
   } else if(init.values==FALSE){
     inits = function(){
@@ -114,7 +116,9 @@ fit_jabba = function(jbinput,
            #q = pmin(pmax(qbound[1]*1.05,runif(jbd$nq,min(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T),mean(jbd$I,na.rm=T)/max(jbd$TC,na.rm=T))),qbound[2]*0.95), 
            psi=rbeta(1,ab[1],ab[2]),
            isigma2.est=runif(1,20,100), 
-           itau2=runif(jbd$nvar,80,200))
+           itau2=runif(jbd$nvar,80,200),
+           phi.frs=0,
+           FRS_resid.0=0)
       }   
   }else {
     
@@ -132,7 +136,9 @@ fit_jabba = function(jbinput,
            q = init.q,
            psi=rbeta(1,ab[1],ab[2]), 
            isigma2.est=runif(1,20,100), 
-           itau2=runif(jbd$nvar,80,200))}
+           itau2=runif(jbd$nvar,80,200),
+           phi.frs=0,
+           FRS_resid.0=0)}
   }
   
   
