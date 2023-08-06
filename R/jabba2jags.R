@@ -296,7 +296,7 @@ cat("
     for (t in 1:N)
     {
     Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
-    FRS_resid[t,i] <- log(CPUE[t,i]) - Imean[t,i];
+    FRS_resid[t,i] <- log(cpue[t,i]) - Imean[t,i];
     CPUE[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]))
     }
 
@@ -351,7 +351,7 @@ cat("
     for (t in 1:N)
     {
     Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
-    FRS_resid[t,i] <- log(CPUE[t,i]) - Imean[t,i];
+    FRS_resid[t,i] <- log(cpue[t,i]) - Imean[t,i];
     CPUE[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]))
     }
 
@@ -431,12 +431,12 @@ cat("
            # Observation equation in related to EB
             one <- sets.q
            
-           for(i in 1:nI)
+    for(i in 1:nI)
     {
     for (t in 1:N)
     {
     Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
-    FRS_resid[t,i] <- log(CPUE[t,i]) - Imean[t,i];
+    FRS_resid[t,i] <- log(cpue[t,i]) - Imean[t,i];
     CPUE[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]))
     }
 
