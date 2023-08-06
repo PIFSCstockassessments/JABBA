@@ -467,7 +467,7 @@ cat("
    #         CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
    #         Ihat[t,i]  <- exp(Imean[t,i])
 #
-            }}
+ #           }}
           
           ",append=TRUE)
       }
