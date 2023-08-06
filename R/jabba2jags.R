@@ -291,8 +291,8 @@ cat("
      cat("
      # Observation equation in related to EB
 
-    for(i in 1:nran.q)
-    {
+    for(i in 1:(nI-1))
+    { 
     for (t in 1:N)
     {
     Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
@@ -304,14 +304,22 @@ cat("
     
     for (t in 2:N) {
     Imean2[t,i] <- Imean[t,i] + phi.frs * FRS_resid[t-1,i];
-    }
-
-    for (t in 2:N) {
     I[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]));
-   # CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
     Ihat[t,i]  <- exp(Imean2[t,i])
     }
-    }",append=TRUE)
+    }
+     
+    for(i in 2:(nI))
+    {
+    for (t in 1:N)
+    {
+    Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
+    I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
+    CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
+    Ihat[t,i]  <- exp(Imean[t,i])
+    }
+    }
+    ",append=TRUE)
      if (length(grep("absolute", jbinput$settings$index_type, ignore.case = TRUE)) > 0 & jbinput$settings$nran.q == 1){
   cat("
       ## added for BFISH index
@@ -346,8 +354,8 @@ cat("
     cat("
     # Observation equation in related to EB
 
-    for(i in 1:nI)
-    {
+    for(i in 1:(nI-1))
+    { 
     for (t in 1:N)
     {
     Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
@@ -359,14 +367,22 @@ cat("
     
     for (t in 2:N) {
     Imean2[t,i] <- Imean[t,i] + phi.frs * FRS_resid[t-1,i];
-    }
-
-    for (t in 2:N) {
     I[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]));
-   # CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
     Ihat[t,i]  <- exp(Imean2[t,i])
     }
     }
+     
+    for(i in 2:(nI))
+    {
+    for (t in 1:N)
+    {
+    Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
+    I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
+    CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
+    Ihat[t,i]  <- exp(Imean[t,i])
+    }
+    }
+
     ",append=TRUE)
 
   }
@@ -431,8 +447,8 @@ cat("
            # Observation equation in related to EB
             one <- sets.q
            
-    for(i in 1:nI)
-    {
+    for(i in 1:(nI-1))
+    { 
     for (t in 1:N)
     {
     Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
@@ -444,12 +460,19 @@ cat("
     
     for (t in 2:N) {
     Imean2[t,i] <- Imean[t,i] + phi.frs * FRS_resid[t-1,i];
-    }
-
-    for (t in 2:N) {
     I[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]));
-   # CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
     Ihat[t,i]  <- exp(Imean2[t,i])
+    }
+    }
+     
+    for(i in 2:(nI))
+    {
+    for (t in 1:N)
+    {
+    Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
+    I[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]));
+    CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
+    Ihat[t,i]  <- exp(Imean[t,i])
     }
     }
 
