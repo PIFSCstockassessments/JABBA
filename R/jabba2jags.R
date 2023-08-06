@@ -132,6 +132,10 @@ cat("
       itau2[i]~ dgamma(0.2,0.1)   #These are (0.001,0.001) OR (0.2,0.1) in previous assessment
       tau2[i] <- 1/itau2[i]
       }
+
+      phi.frs ~ dnorm(0,1.0E-4) I(-1,1)      #autocorrelation coefficient for frs 
+      FRS_resid.0 ~ dnorm(0,4) I(-3,3)  #initial resid for frs
+
   
       for(i in 1:(nvar)) #JS added -1 #MO changed from nI-1
       {
@@ -342,15 +346,27 @@ cat("
     cat("
     # Observation equation in related to EB
 
-    for(i in 1:(nI))
+    for(i in 1:nI)
     {
     for (t in 1:N)
     {
     Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
-    I[t,i] ~ dlnorm(Imean[t,i],ivar.obs[t,i]);
-    CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
-    Ihat[t,i]  <- exp(Imean[t,i])
+    FRS_resid[t,i] <- log(CPUE[t,i]) - Imean[t,i];
+    CPUE[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]))
+    }
 
+    Imean2[1,i] <- Imean[1,i] + phi.frs * FRS_resid.0
+    
+    for (t in 2:N) {
+    Imean2[t,i] <- Imean1[t,i] + phi.frs * FRS_resid[t-1,i];
+    }
+
+    for (t in 2:N) {
+    I[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]));
+   # CPUE[t,i] ~ dlnorm(Imean[t,i],(ivar.obs[t,i]))   ####q[[i]]*P[t]*SB0*EBtoSB[t,i]
+    Ihat[t,i]  <- exp(Imean2[t,i])
+    }
+    }
     }}",append=TRUE)
 
   }
