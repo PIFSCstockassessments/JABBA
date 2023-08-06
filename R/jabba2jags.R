@@ -367,7 +367,7 @@ cat("
     Ihat[t,i]  <- exp(Imean2[t,i])
     }
     }
-    }}",append=TRUE)
+    ",append=TRUE)
 
   }
 
