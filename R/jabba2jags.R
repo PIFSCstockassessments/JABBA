@@ -217,7 +217,7 @@ cat("
     #Process equation base prediction
     Pmean[1] <- log(psi) 
 
-    penB[1]  <- ifelse( P.mean2.base[1]<P_bound[1],log(K* P.mean2.base[1])-log(K*P_bound[1]),ifelse( P.mean2.base[1]>P_bound[2],log(K* P.mean2.base[1])-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass 
+   # penB[1]  <- ifelse( P.mean2.base[1]<P_bound[1],log(K* P.mean2.base[1])-log(K*P_bound[1]),ifelse( P.mean2.base[1]>P_bound[2],log(K* P.mean2.base[1])-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass 
     penBK[1] <- 0
 
     # Process equation base prediction
@@ -245,7 +245,7 @@ cat("
 
 
   # P.mean1 <- Pmean[1:N]   ##JS added jags is particular about indexing so had to add these
-   P <- P.mean2.base[1:(N+1)]  ##JS added jags is particular about indexing so had to add these
+  # P <- P.mean2.base[1:(N+1)]  ##JS added jags is particular about indexing so had to add these
   # log.resid<-log.resid.base[1:N]  ##JS added jags is particular about indexing so had to add these
 
 
@@ -255,12 +255,12 @@ cat("
     tau.red <- isigma2 * (1-phi*phi)  #this is precision of total biomass variation that includes white noise and correlated error
     sigma.red <- 1 / sqrt(tau.red)
     
-    for (t in 2:N)
-    {
-    penB[t]  <- ifelse(P.mean2.base[t]<(P_bound[1]),log(K*P.mean2.base[t])-log(K*(P_bound[1])),ifelse(P.mean2.base[t]>P_bound[2],log(K*P.mean2.base[t])-log(K*(P_bound[2])),0)) # penalty if Pmean is outside viable biomass
+   # for (t in 2:N)
+   # {
+   # penB[t]  <- ifelse(P.mean2.base[t]<(P_bound[1]),log(K*P.mean2.base[t])-log(K*(P_bound[1])),ifelse(P.mean2.base[t]>P_bound[2],log(K*P.mean2.base[t])-log(K*(P_bound[2])),0)) # penalty if Pmean is outside viable biomass
     # Depletion prior
-    penBK[t] <- ifelse(b.yr[t] < 1,0,log(ifelse(b.pr[4]<1,P.mean2.base[t],ifelse(b.pr[4]>1,HtoHmsy[t],BtoBmsy[t])))-log(b.pr[1]))
-    }
+   # penBK[t] <- ifelse(b.yr[t] < 1,0,log(ifelse(b.pr[4]<1,P.mean2.base[t],ifelse(b.pr[4]>1,HtoHmsy[t],BtoBmsy[t])))-log(b.pr[1]))
+   # }
 
 
    #Previous process error incorporation
@@ -300,7 +300,7 @@ cat("
     
     for (t in 1:(N+1)) # One step ahead biomass
     {
-    SB[t] <- K*P[t]   #P.mean2.base
+    SB[t] <- K*P.mean2.base[t]   
     BtoBmsy[t] <- SB[t]/SBmsy
     }
 
