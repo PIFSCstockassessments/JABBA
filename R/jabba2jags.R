@@ -245,7 +245,7 @@ cat("
 
 
   # P.mean1 <- Pmean[1:N]   ##JS added jags is particular about indexing so had to add these
-  # P <- P.mean2.base[1:N]  ##JS added jags is particular about indexing so had to add these
+   P <- P.mean2.base[1:(N+1)]  ##JS added jags is particular about indexing so had to add these
   # log.resid<-log.resid.base[1:N]  ##JS added jags is particular about indexing so had to add these
 
 
@@ -300,7 +300,7 @@ cat("
     
     for (t in 1:(N+1)) # One step ahead biomass
     {
-    SB[t] <- K*P.mean2.base[t]
+    SB[t] <- K*P[t]   #P.mean2.base
     BtoBmsy[t] <- SB[t]/SBmsy
     }
 
