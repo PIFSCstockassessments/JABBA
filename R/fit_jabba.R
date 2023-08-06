@@ -107,7 +107,7 @@ fit_jabba = function(jbinput,
          rad = runif(1, 10, 60),
          log.resid.0=0,
          phi=0,
-         P.base=rep(0.75,length(jbinput$data$yr))
+         P.base=rep(0.75,length(jbinput$data$yr+1))
          )
       }
   } else if(init.values==FALSE){
@@ -122,7 +122,7 @@ fit_jabba = function(jbinput,
            rad = runif(1, 10, 60),
            log.resid.0=0,
            phi=0,
-           P.base=rep(0.75,length(jbinput$data$yr)))
+           P.base=rep(0.75,length(jbinput$data$yr+1)))
       }   
   }else {
     
@@ -144,7 +144,7 @@ fit_jabba = function(jbinput,
           rad = runif(1, 10, 60),
            log.resid.0=0,
            phi=0,
-           P.base=rep(0.75,length(jbinput$data$yr)))
+           P.base=rep(0.75,length(jbinput$data$yr+1)))
            }
   }
   
