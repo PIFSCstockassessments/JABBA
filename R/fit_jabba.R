@@ -108,7 +108,7 @@ fit_jabba = function(jbinput,
          log.resid.0=0,
          phi=0,
          P.base=rep(0.75,length(jbinput$data$yr)+1))
-         )
+        
       }
   } else if(init.values==FALSE){
     inits = function(){
