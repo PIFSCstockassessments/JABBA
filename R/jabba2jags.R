@@ -303,7 +303,7 @@ cat("
     Imean2[1,i] <- Imean[1,i] + phi.frs * FRS_resid.0
     
     for (t in 2:N) {
-    Imean2[t,i] <- Imean1[t,i] + phi.frs * FRS_resid[t-1,i];
+    Imean2[t,i] <- Imean[t,i] + phi.frs * FRS_resid[t-1,i];
     }
 
     for (t in 2:N) {
@@ -358,7 +358,7 @@ cat("
     Imean2[1,i] <- Imean[1,i] + phi.frs * FRS_resid.0
     
     for (t in 2:N) {
-    Imean2[t,i] <- Imean1[t,i] + phi.frs * FRS_resid[t-1,i];
+    Imean2[t,i] <- Imean[t,i] + phi.frs * FRS_resid[t-1,i];
     }
 
     for (t in 2:N) {
@@ -443,7 +443,7 @@ cat("
     Imean2[1,i] <- Imean[1,i] + phi.frs * FRS_resid.0
     
     for (t in 2:N) {
-    Imean2[t,i] <- Imean1[t,i] + phi.frs * FRS_resid[t-1,i];
+    Imean2[t,i] <- Imean[t,i] + phi.frs * FRS_resid[t-1,i];
     }
 
     for (t in 2:N) {
