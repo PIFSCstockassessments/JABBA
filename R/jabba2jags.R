@@ -361,7 +361,7 @@ cat("
     Imean[t,i] <- log(q[sets.q[i]]*P[t]*K);
     FRS_resid[t,i] <- log(CPUE[t,i]) - Imean[t,i];
     CPUE[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]))
-    Ihat[t,i]  <- exp(Imean2[t,i])
+   # Ihat[t,i]  <- exp(Imean2[t,i])
     }
 
     Imean2[1,i] <- Imean[1,i] + phi.frs * FRS_resid.0
@@ -370,9 +370,13 @@ cat("
     Imean2[t,i] <- Imean[t,i] + phi.frs * FRS_resid[t-1,i];
     I[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]));
     }
-  
+   
+    for (t in 1:N)
+    {
+    Ihat[t,i]  <- exp(Imean2[t,i])
     }
-     
+    }
+
     for(i in 2:(nI))
     {
     for (t in 1:N)
