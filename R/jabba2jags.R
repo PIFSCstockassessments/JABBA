@@ -302,7 +302,7 @@ cat("
 
     Imean2[1,i] <- Imean[1,i] + phi.frs * FRS_resid.0
     
-    for (t in 2:(N+1))  {
+    for (t in 2:N) {
     Imean2[t,i] <- Imean[t,i] + phi.frs * FRS_resid[t-1,i];
     I[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]));
     Ihat[t,i]  <- exp(Imean2[t,i])
@@ -365,7 +365,7 @@ cat("
 
     Imean2[1,i] <- Imean[1,i] + phi.frs * FRS_resid.0
     
-    for (t in 2:(N+1)) {
+    for (t in 2:N) {
     Imean2[t,i] <- Imean[t,i] + phi.frs * FRS_resid[t-1,i];
     I[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]));
     Ihat[t,i]  <- exp(Imean2[t,i])
@@ -458,7 +458,7 @@ cat("
 
     Imean2[1,i] <- Imean[1,i] + phi.frs * FRS_resid.0
     
-    for (t in 2:(N+1))  {
+    for (t in 2:N) {
     Imean2[t,i] <- Imean[t,i] + phi.frs * FRS_resid[t-1,i];
     I[t,i] ~ dlnorm(Imean2[t,i],(ivar.obs[t,i]));
     Ihat[t,i]  <- exp(Imean2[t,i])
