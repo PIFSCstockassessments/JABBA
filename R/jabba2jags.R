@@ -636,9 +636,9 @@ cat("
             fakepyrs <- pyrs
             fakenTAC <- nTAC
             fakenranq <- nran.q
-            prHtoHmsy <- 1
-            prP <- 1
-            prBtoBmsy <- 1
+    #        prHtoHmsy <- 1
+    #        prP <- 1
+    #        prBtoBmsy <- 1
             ", append=TRUE)}
   
   cat("
