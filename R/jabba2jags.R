@@ -300,7 +300,7 @@ cat("
     
     for (t in 1:(N+1)) # One step ahead biomass
     {
-    SB[t] <- K*P.mean2.base[t]   
+    SB[t] <- K*P.base[t]   #P.mean2.base[t]
     BtoBmsy[t] <- SB[t]/SBmsy
     }
 
