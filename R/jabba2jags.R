@@ -275,7 +275,7 @@ cat("
 
     # Process error deviation
     for(t in 1:N){
-    Proc.Dev[t] <- log(P.mean2.base[t]*K)-log(exp(Pmean[t])*K)}
+    Proc.Dev[t] <- log(P.base[t]*K)-log(exp(Pmean[t])*K)}
 
     # Enforce soft penalties on bounds for P
   #  for(t in 1:N){
