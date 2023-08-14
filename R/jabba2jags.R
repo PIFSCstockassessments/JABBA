@@ -231,7 +231,7 @@ cat("
    #Initialize uncorrelated residuals
     for (t in 1:(N+1))
     {
-   P.base[t] ~ dnorm(P.mean2.base[t],isigma2)   
+   P.base[t] ~ dlnorm(P.mean2.base[t],isigma2)   
    log.resid.base[t]<-log(P.base[t])-(Pmean[t])
     }
 
@@ -251,7 +251,7 @@ cat("
 
 
     phi ~ dnorm(0,1.0E-4) I(-1,1)   #serial autocorrelation coefficient  
-    log.resid.0 ~ dnorm(0,tau.red) T(-5,5)
+    log.resid.0 ~ dlnorm(0,tau.red) T(-5,5)
     tau.red <- isigma2 * (1-phi*phi)  #this is precision of total biomass variation that includes white noise and correlated error
     sigma.red <- 1 / sqrt(tau.red)
     
