@@ -261,7 +261,7 @@ fit_jabba = function(jbinput,
   catch.temp = matrix(rep(catch[,2],each=nrow(posteriors$SB)),ncol=nrow(jbinput$data$catch),nrow=nrow(posteriors$SB))
   #JS added Overfishing ref point below
   yrdim = length(years)
-  Stock_trj = array(data=NA,dim=c(yrdim,3,8),dimnames = list(years,c("mu","lci","uci"),c("B","F","BBmsy","FFmsy","Overfishing_ind","BB0","procB","SPt"))) 
+  Stock_trj = array(data=NA,dim=c(yrdim,3,9),dimnames = list(years,c("mu","lci","uci"),c("B","F","BBmsy","FFmsy","Overfishing_ind","BB0","procB","BBfrac","SPt"))) 
   for(i in 1:3){
     Stock_trj[,i,] =  cbind(t(apply(posteriors$SB[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$H[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
@@ -270,6 +270,7 @@ fit_jabba = function(jbinput,
                             t(apply(posteriors$Overfishing_ind[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$P[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(apply(posteriors$Proc.Dev[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
+                            t(apply(posteriors$BtoBfrac[,1:yrdim],2,quantile,c(0.5,0.025,0.975)))[,i],
                             t(cbind(rep(0,3),apply(posteriors$SB[,-1]-posteriors$SB[,-ncol(posteriors$SB)]+catch.temp[,-ncol(posteriors$SB)],2,quantile,c(0.5,0.025,0.975)))[,1:yrdim])[,i]
     )
     
