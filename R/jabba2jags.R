@@ -280,6 +280,7 @@ cat("
     for (t in 1:N)  # Overfishing status given state-dependent rule
     {
     Overfishing_ind[t]<-ifelse(BtoBmsy[t]>0.866, H[t]/(Hmsy),  H[t]/((Hmsy*SB[t])/(0.866*SBmsy)))
+     BtoBfrac[t] <- SB[t]/(SBmsy*bfrac)
     }
 
 
@@ -679,6 +680,7 @@ cat("
       prH[t,i] <- TAC[t,i]/prB[t,i]
       prHtoHmsy[t,i] <- prH[t,i]/Hmsy
       prBtoBmsy[t,i] <- prB[t,i]/SBmsy
+      prBtoBfrac[t,i] <- prB[t,i]/(SBmsy*bfrac)
       prOverfishing_ind[t,i]<-ifelse(prBtoBmsy[t,i]>0.866, prH[t,i]/(Hmsy),  prH[t,i]/((Hmsy*prB[t,i])/(0.866*SBmsy)))
       }}
       ",append=TRUE)} else {
@@ -691,6 +693,8 @@ cat("
             prHtoHmsy <- 1
             prP <- 1
             prBtoBmsy <- 1
+            prBtoBfrac <- 1
+            prOverfishing_ind <- 1
             ", append=TRUE)}
   
   cat("

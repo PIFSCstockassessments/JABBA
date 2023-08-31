@@ -57,6 +57,7 @@
 #' @param qA_bounds Defines lower and upper bounds for q of auxiliary data type effort 
 #' @param harvest.label = c("Hmsy","Fmsy")[2], # choose label preference H/Hmsy versus Fmsy
 #' @param catch.metric  "(t)" # Define catch input metric e.g. (tons) "000 t" 
+#' @param bfrac the amount to reduce BMSY by for overfished reference point. Default value is 1, for MSST, use `bfrac` = 1-M
 #' @param verbose option show cat comments
 #' @return List to be used as data input to JABBA JAGS model.
 #' @export
@@ -119,6 +120,7 @@ build_jabba <- function(
   # Settings
   harvest.label = c("Hmsy","Fmsy")[2], # choose label preference H/Hmsy versus Fmsy
   catch.metric = "(t)", # Define catch input metric e.g. (tons) "000 t" etc
+  bfrac = 1,
   verbose=TRUE
 ){
   
@@ -476,15 +478,15 @@ if(!is.null(rad.prior)){
                      nq=nq,nvar=nvar,sigma.fixed=ifelse(sigma.proc==TRUE,0,sigma.proc),
                      sets.var=sets.var, sets.q=sets.q,Plim=Plim,slope.HS=slope.HS,
                      nTAC=nTAC,pyrs=pyrs,TAC=TAC,igamma = igamma,stI=stI,pen.P = rep(0,n.years) ,pen.bk = rep(0,n.years),proc.pen=0,K.pen = 0,
-                     obs.pen = rep(0,nvar),P_bound=P_bound,q_bounds=q_bounds,sigmaobs_bound=sigmaobs_bound,sigmaproc_bound=sigmaproc_bound,K_bounds=K_bounds,mu.m=m,b.yr=b.yr, b.pr = b.pr)
-                     params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","Overfishing_ind","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","prOverfishing_ind","TOE", "rad","phi.frs")
+                     obs.pen = rep(0,nvar),P_bound=P_bound,q_bounds=q_bounds,sigmaobs_bound=sigmaobs_bound,sigmaproc_bound=sigmaproc_bound,K_bounds=K_bounds,mu.m=m,b.yr=b.yr, b.pr = b.pr,bfrac=bfrac)
+                     params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","BtoBfrac","HtoHmsy","Overfishing_ind","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","prBtoBfrac", "prOverfishing_ind","TOE", "rad","phi.frs")
   }else{
     surplus.dat = list(N=n.years, TC = TC,I=CPUE,SE2=se2,r.pr=r.pr,psi.pr=psi.pr,K.pr = K.pr,
                      nq=nq,nI = nI,nvar=nvar,nran.q=nran.q,sigma.fixed=ifelse(sigma.proc==TRUE,0,sigma.proc),
                      sets.var=sets.var, sets.q=sets.q,cpue_lambda=cpue_lambda,Plim=Plim,slope.HS=slope.HS,
                      nTAC=nTAC,pyrs=pyrs,TAC=TAC,igamma = igamma,stI=stI,pen.P = rep(0,n.years) ,pen.bk = rep(0,n.years),proc.pen=0,K.pen = 0,
-                     obs.pen = rep(0,nvar),P_bound=P_bound,q_bounds=q_bounds,sigmaobs_bound=sigmaobs_bound,sigmaproc_bound=sigmaproc_bound,K_bounds=K_bounds,mu.m=m,b.yr=b.yr, b.pr = b.pr)
-    params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","Overfishing_ind","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","prOverfishing_ind","TOE","phi.frs")
+                     obs.pen = rep(0,nvar),P_bound=P_bound,q_bounds=q_bounds,sigmaobs_bound=sigmaobs_bound,sigmaproc_bound=sigmaproc_bound,K_bounds=K_bounds,mu.m=m,b.yr=b.yr, b.pr = b.pr,bfrac=bfrac)
+    params <- c("K","r", "q", "psi","sigma2", "tau2","m","Hmsy","SBmsy", "MSY", "BtoBmsy","HtoHmsy","BtoBfrac","Overfishing_ind","CPUE","Ihat","Proc.Dev","P","SB","H","prP","prBtoBmsy","prHtoHmsy","prBtoBfrac","prOverfishing_ind","TOE","phi.frs")
   }
   
   

@@ -60,6 +60,7 @@ build_jabba(
   qA_bounds = c(10^-30, 1000),
   harvest.label = c("Hmsy", "Fmsy")[2],
   catch.metric = "(t)",
+  bfrac = 1,
   verbose = TRUE
 )
 }
@@ -167,6 +168,8 @@ VARIANCE options}
 \item{harvest.label}{= c("Hmsy","Fmsy")[2], # choose label preference H/Hmsy versus Fmsy}
 
 \item{catch.metric}{"(t)" # Define catch input metric e.g. (tons) "000 t"}
+
+\item{bfrac}{the amount to reduce BMSY by for overfished reference point. Default value is 1, for MSST, use `bfrac` = 1-M}
 
 \item{verbose}{option show cat comments}
 
