@@ -1531,7 +1531,7 @@ jabba_plots = function(jabba,output.dir = getwd(),as.png=TRUE,statusplot ="kobe"
 #' jbplot_retro(hc,forecast=TRUE) # with retro forecasting
 #' }
 
-jbplot_retro <- function(hc,type=c("B","F","BBmsy","FFmsy","procB","SP"),forecast=FALSE,ylabs=NULL,
+jbplot_retro <- function(hc,type=c("B","F","BBmsy","FFmsy","procB","BBfrac","SP"),forecast=FALSE,ylabs=NULL,
                          add=F,output.dir=getwd(),as.png=FALSE,single.plots=add,width=NULL,height=NULL,xlim=NULL,cols=NULL,legend.loc="topright",verbose=TRUE){
   
   hc.ls = hc 
@@ -1553,16 +1553,16 @@ jbplot_retro <- function(hc,type=c("B","F","BBmsy","FFmsy","procB","SP"),forecas
   
   if(verbose)cat(paste0("\n","><> jbplot_retro() - retrospective analysis <><","\n"))
   if(add) single.plots=TRUE
-  if(single.plots==F) type=c("B","F","BBmsy","FFmsy","procB","SP")
+  if(single.plots==F) type=c("B","F","BBmsy","FFmsy","procB","BBfrac","SP")
   
-  if(is.null(ylabs)) ylabs = c(paste("Biomass",hc$settings$catch.metric),"Fishing mortality F",expression(B/B[MSY]),expression(F/F[MSY]),expression(B/B[0]),"Process Deviations",paste("Surplus Production",hc$settings$catch.metric))
+  if(is.null(ylabs)) ylabs = c(paste("Biomass",hc$settings$catch.metric),"Fishing mortality F",expression(B/B[MSY]),expression(F/F[MSY]),expression(B/B[0]),"Process Deviations",expression(B/B[MSST]), paste("Surplus Production",hc$settings$catch.metric))
   retros = unique(peels)
   runs= hc$timeseries$mu$level
   years= hc$yr
   nyrs = length(years)
   if(is.null(cols)) cols = c("black",ss3col(length(peels)-1))
   if(is.null(xlim)){xlim = range(years)}
-  FRP.rho = c("B","F", "Bmsy", "Fmsy", "procB","MSY")  
+  FRP.rho = c("B","F", "Bmsy", "Fmsy", "procB","Bmsst","MSY")  
   rho = data.frame(mat.or.vec(length(retros)-1,length(FRP.rho)))
   colnames(rho) = FRP.rho
   fcrho = rho
@@ -1578,14 +1578,14 @@ jbplot_retro <- function(hc,type=c("B","F","BBmsy","FFmsy","procB","SP"),forecas
       
       if(as.png==TRUE | add==FALSE) par(Par)
       
-      j = which(c("B","F","BBmsy","FFmsy","BB0","procB","SP")%in%type[k])
+      j = which(c("B","F","BBmsy","FFmsy","BB0","procB","BBfrac","SP")%in%type[k])
       
       
-      if(type[k]%in%c("B","F","BBmsy","FFmsy","procB")){
-        y = hc$timeseries$mu[,j+2]
-        ref = hc$timeseries$mu[runs%in%retros[1],j+2]
-        ylc = hc$timeseries$lci[runs%in%retros[1],j+2]
-        yuc = hc$timeseries$uci[runs%in%retros[1],j+2]
+      if(type[k]%in%c("B","F","BBmsy","FFmsy","procB","BBfrac")){
+        y = hc$timeseries$mu[,type]
+        ref = hc$timeseries$mu[runs%in%retros[1],type]
+        ylc = hc$timeseries$lci[runs%in%retros[1],type]
+        yuc = hc$timeseries$uci[runs%in%retros[1],type]
         if(type[k]=="procB") ylim=c(-max(y[years>=xlim[1] & years<=xlim[2]],yuc[years>=xlim[1] & years<=xlim[2]])
                                     ,max(y[years>=xlim[1] & years<=xlim[2]],yuc[years>=xlim[1] & years<=xlim[2]]))
         if(!type[k]=="procB") ylim=c(0,max(y[years>=xlim[1] & years<=xlim[2]],yuc[years>=xlim[1] & years<=xlim[2]]))
@@ -1608,7 +1608,7 @@ jbplot_retro <- function(hc,type=c("B","F","BBmsy","FFmsy","procB","SP"),forecas
             }
           }
         }
-        if(type[k]%in%c("BBmsy","FFmsy")) abline(h=1,lty=2)
+        if(type[k]%in%c("BBmsy","FFmsy","BBfrac")) abline(h=1,lty=2)
         if(type[k]%in%c("procB")) abline(h=0,lty=2)
       } 
       else {
@@ -1638,14 +1638,14 @@ jbplot_retro <- function(hc,type=c("B","F","BBmsy","FFmsy","procB","SP"),forecas
     par(Par)
     for(k in 1:length(type)){
       
-      j = which(c("B","F","BBmsy","FFmsy","BB0","procB","SP")%in%type[k])
+      j = which(c("B","F","BBmsy","FFmsy","BB0","procB","BBfrac","SP")%in%type[k])
       
       
-      if(type[k]%in%c("B","F","BBmsy","FFmsy","procB")){
-        y = hc$timeseries$mu[,j+2]
-        ref = hc$timeseries$mu[runs%in%retros[1],j+2]
-        ylc = hc$timeseries$lci[runs%in%retros[1],j+2]
-        yuc = hc$timeseries$uci[runs%in%retros[1],j+2]
+      if(type[k]%in%c("B","F","BBmsy","FFmsy","procB","BBfrac")){
+        y = hc$timeseries$mu[,type]
+        ref = hc$timeseries$mu[runs%in%retros[1],type]
+        ylc = hc$timeseries$lci[runs%in%retros[1],type]
+        yuc = hc$timeseries$uci[runs%in%retros[1],type]
         if(type[k]=="procB") ylim=c(-max(y[years>=xlim[1] & years<=xlim[2]],yuc[years>=xlim[1] & years<=xlim[2]])
                                     ,max(y[years>=xlim[1] & years<=xlim[2]],yuc[years>=xlim[1] & years<=xlim[2]]))
         if(!type[k]=="procB") ylim=c(0,max(y[years>=xlim[1] & years<=xlim[2]],yuc[years>=xlim[1] & years<=xlim[2]]))
@@ -1667,7 +1667,7 @@ jbplot_retro <- function(hc,type=c("B","F","BBmsy","FFmsy","procB","SP"),forecas
             }
           }
         }
-        if(type[k]%in%c("BBmsy","FFmsy")) abline(h=1,lty=2)
+        if(type[k]%in%c("BBmsy","FFmsy","BBfrac")) abline(h=1,lty=2)
         if(type[k]%in%c("procB")) abline(h=0,lty=2)
         if(single.plots==TRUE | k==1 )  legend(legend.loc,paste(years[nyrs-retros]),col=cols,bty="n",cex=0.7,pt.cex=0.7,lwd=c(2,rep(1.5,length(retros))))
         if(!forecast) legend("top",legend=bquote(rho == .(round(mean(rho[,k]),2))) ,bty="n",x.intersp=-0.2,y.intersp=-0.3,cex=0.8)
