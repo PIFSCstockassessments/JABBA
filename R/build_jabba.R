@@ -359,7 +359,7 @@ if(!is.null(rad.prior)){
   log.rad = log(rad.prior[1])
   CV.rad = rad.prior[2] 
   sd.rad = sqrt(log(CV.rad^2+1))
-  rad.pr = plot_lnorm(mu = log.rad, CV.rad, Prior = "Radius")
+  rad.pr = plot_lnorm(mu = exp(log.rad), CV.rad, Prior = "Radius")
 }
 
   # Get input priors
