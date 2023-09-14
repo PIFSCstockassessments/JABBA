@@ -474,7 +474,7 @@ if(!is.null(rad.prior)){
   if(!is.null(rad.prior)){
     surplus.dat = list(N=n.years, TC = TC,I=CPUE,SE2=se2,r.pr=r.pr,psi.pr=psi.pr,K.pr = K.pr,
                      rad.pr=rad.pr,n.grid=n.grid,a.grid=a.grid, #rel.ind =rel.ind,
-                     s_lambda=s_lambda, nran.q = nran.q,
+                     s_lambda=s_lambda, nran.q = nran.q,cpue_lambda=cpue_lambda,
                      nq=nq,nvar=nvar,sigma.fixed=ifelse(sigma.proc==TRUE,0,sigma.proc),
                      sets.var=sets.var, sets.q=sets.q,Plim=Plim,slope.HS=slope.HS,
                      nTAC=nTAC,pyrs=pyrs,TAC=TAC,igamma = igamma,stI=stI,pen.P = rep(0,n.years) ,pen.bk = rep(0,n.years),proc.pen=0,K.pen = 0,
