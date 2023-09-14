@@ -19,7 +19,7 @@ if ("index_type" %in% names(jbinput$settings) & length(grep("absolute", jbinput$
   if(jbinput$settings$nran.q == 1){
     cat("
   #Camera effective radius prior
-    rad ~ dlnorm(rad.pr[1], pow(rad.pr[2],-2))T(7.5,60.6)
+    rad ~ dlnorm(log(rad.pr[1]), pow(rad.pr[2],-2))T(7.5,60.6)
 
     q[1] ~ dunif(q_bounds[1], q_bounds[2])
     q[2] <- a.grid/(rad*rad*3.14159) 
