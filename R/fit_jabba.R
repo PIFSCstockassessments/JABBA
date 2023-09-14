@@ -194,7 +194,7 @@ fit_jabba = function(jbinput,
   
   # run some mcmc convergence tests
   if(length(grep("rad", params)) > 0){
-    par.dat= data.frame(posteriors[params[c(1:7,25)]]) #25 for rad
+    par.dat= data.frame(posteriors[params[c(1:7,27)]]) #25 for rad
   }else{
     par.dat= data.frame(posteriors[params[c(1:7)]]) 
   }
@@ -459,7 +459,7 @@ fit_jabba = function(jbinput,
   # Note posteriors of key parameters
   #-----------------------------------
   if(length(grep("rad", params)) > 0){
-    sel.par = c(1,2,7,4,3,5,25) #MO added 25 - radius
+    sel.par = c(1,2,7,4,3,5,27) #MO added 27 - radius
   }else{
     sel.par = c(1,2,7,4,3,5) 
   }
