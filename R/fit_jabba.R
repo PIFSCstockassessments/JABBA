@@ -564,10 +564,23 @@ fit_jabba = function(jbinput,
     
     kb = NULL
     for(i in 1:N){
-      if(settings$add.catch.CV==FALSE){Ci = rep(jabba$catch[i],length(posteriors$K))} else {Ci = posteriors$estC[,i]}    
-      kb = rbind(kb,data.frame(year=years[i],run=jabba$scenario,type="fit",iter=1:length(posteriors$K),
-                               stock=posteriors$BtoBmsy[,i],harvest=posteriors$HtoHmsy[,i],B=posteriors$SB[,i],H=posteriors$H[,i],
-                               Bdev=posteriors$Proc.Dev[,i],Catch=Ci,BB0=posteriors$P[,i]))
+      if(settings$add.catch.CV==FALSE){
+        Ci = rep(jabba$catch[i],length(posteriors$K))
+        } else {
+          Ci = posteriors$estC[,i]}    
+      kb = rbind(kb,
+                 data.frame(year=years[i],
+                            run=jabba$scenario,
+                            type="fit",
+                            iter=1:length(posteriors$K),
+                            stock=posteriors$BtoBmsy[,i],
+                            harvest=posteriors$HtoHmsy[,i],
+                            Overfishing = posteriors$Overfishing_ind[,i],
+                            B=posteriors$SB[,i],
+                            H=posteriors$H[,i],
+                            Bdev=posteriors$Proc.Dev[,i],
+                            Catch=Ci,
+                            BB0=posteriors$P[,i]))
     }
     jabba$kbtrj = kb
   }
