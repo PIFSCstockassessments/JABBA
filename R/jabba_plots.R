@@ -1235,11 +1235,12 @@ jbplot_kobe_bfrac <- function(jabba,bfrac=bfrac,ylab=NULL,xlab=NULL, output.dir=
 mu.f = jabba$timeseries[,,"FFmsy"]
 mu.b = jabba$timeseries[,,"BBmsy"]
 b = jabba$kobe$stock
+f = jabba$kobe$harvest
 years=jabba$yr
 N = length(years)
 of = jabba$posteriors$Overfishing_ind[,N] #probability of overfishing in terminal year
 # fit kernel function
-kernelF <- gplots::ci2d(b,of,nbins=151,factor=1.5,ci.levels=c(0.50,0.80,0.75,0.90,0.95),show="none",col=1,xlab= ifelse(jabba$settings$harvest.label=="Fmsy",expression(paste(F/F[MSY])),expression(paste(H/H[MSY]))),ylab=expression(paste(B/B[MSY])))
+kernelF <- gplots::ci2d(b,f,nbins=151,factor=1.5,ci.levels=c(0.50,0.80,0.75,0.90,0.95),show="none",col=1,xlab= ifelse(jabba$settings$harvest.label=="Fmsy",expression(paste(F/F[MSY])),expression(paste(H/H[MSY]))),ylab=expression(paste(B/B[MSY])))
 
 Par = list(mfrow=c(1,1),mar = c(3.5, 3.5, 0.1, 0.1), mgp =c(2.,0.5,0), tck = -0.02,cex=0.8)
 if(as.png==TRUE){ png(file = paste0(output.dir,"/Kobe_",jabba$assessment,"_",jabba$scenario,".png"), width = width, height = height,

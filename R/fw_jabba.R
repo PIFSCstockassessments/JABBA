@@ -125,7 +125,7 @@ fw_jabba <- function(jabba,nyears = 10, imp.yr = NULL,
   msy= bmsy*fmsy 
   pyears = c(year[n],year[n]+(1:nyears))  
   iters = length(k) 
-  P = devs = B = H =  matrix(NA,ncol = nyears+1, nrow = iters)
+  P = devs = B = H = OF_ind = matrix(NA,ncol = nyears+1, nrow = iters)
   C = matrix(NA,ncol = nyears+1, nrow = iters)
   C[,1] =inits$Catch
   devs[,1]= inits$Bdev
@@ -138,6 +138,7 @@ fw_jabba <- function(jabba,nyears = 10, imp.yr = NULL,
   P[,1] = inits$BB0
   B[,1] = inits$B
   H[,1] = pmax(inits$H,0.001)
+  OF_ind[,1] = inits$Overfishing
   
   # check length of initial values
   if(is.null(imp.yr)) imp.yr = length(initial)+1 
@@ -191,9 +192,18 @@ fw_jabba <- function(jabba,nyears = 10, imp.yr = NULL,
     if(quant=="Catch") C[,(imp.yr+1):ncol(C)][] = pmax(x[[2]],0.001)
     if(quant=="F") H[,(imp.yr+1):ncol(C)][] = pmax(x[[2]],0.001)
     }
-    kb = data.frame(year=pyears[1],run=x[[1]],type="fit",iter=1:iters,
-                    stock=B[,1]/bmsy,harvest=H[,1]/fmsy,B=B[,1],H=H[,1],
-                    Bdev=devs[,1],Catch=C[,1],BB0=P[,1])
+    kb = data.frame(year=pyears[1],
+                    run=x[[1]],
+                    type="fit",
+                    iter=1:iters,
+                    stock=B[,1]/bmsy,
+                    harvest=H[,1]/fmsy,
+                    Overfishing = OF_ind[,1],
+                    B=B[,1],
+                    H=H[,1],
+                    Bdev=devs[,1],
+                    Catch=C[,1],
+                    BB0=P[,1])
     
     for(i in 2:ncol(P)){
       P[,i] <- pmax((P[,i-1]+  r/(m-1)*P[,i-1]*(1-P[,i-1]^(m-1)) - C[,i-1]/k),0.005)*exp(devs[,i])
@@ -202,9 +212,20 @@ fw_jabba <- function(jabba,nyears = 10, imp.yr = NULL,
         H[,i] = pmax(C[,i],0.001)/B[,i]#,fmax*median(fmsy)) # fmax constraint
       } 
       if(quant=="F") C[,i] = pmax(H[,i],0.0001)*B[,i]
-      kb = rbind(kb,data.frame(year=pyears[i],run=x[[1]],type="prj",iter=1:iters,
-                               stock=B[,i]/bmsy,harvest=H[,i]/fmsy,B=B[,i],H=H[,i],
-                               Bdev=devs[,i],Catch=C[,i],BB0=P[,i]))
+      OF_ind[,i] <- ifelse(B[,i]/bmsy>0.866, H[,i]/fmsy,  H[,i]/((fmsy*B[,i])/(0.866*bmsy)))
+      
+      kb = rbind(kb,data.frame(year=pyears[i],
+                               run=x[[1]],
+                               type="prj",
+                               iter=1:iters,
+                               stock=B[,i]/bmsy,
+                               harvest=H[,i]/fmsy,
+                               Overfishing = OF_ind[,i],
+                               B=B[,i],
+                               H=H[,i],
+                               Bdev=devs[,i],
+                               Catch=C[,i],
+                               BB0=P[,i]))
     }
     kb
   }))
