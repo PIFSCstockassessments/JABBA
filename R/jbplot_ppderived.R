@@ -16,7 +16,11 @@ jbplot_ppderived <- function(jabba, quants = c("MSY", "Bmsy", "Fmsy", "BmsyK"), 
 
 if(verbose) cat(paste0("\n","><> jbplot_ppderived() - prior and posterior distributions of derived quantities <><","\n"))
 
-Prs = as.matrix(cbind(jabba$settings$K.pr,jabba$settings$r.pr,c(jabba$settings$mu.m, jabba$settings$m.CV)))
+if(jabba$settings$model.type == "Pella_m"){
+  Prs = as.matrix(cbind(jabba$settings$K.pr,jabba$settings$r.pr,c(jabba$settings$mu.m, jabba$settings$m.CV)))
+  }else{
+  Prs = as.matrix(cbind(jabba$settings$K.pr,jabba$settings$r.pr,c(jabba$settings$mu.m, 0)))
+  }
 out = jabba$refpts_posterior
 node_id = names(out) 
 node_id = node_id[node_id %in% quants]
