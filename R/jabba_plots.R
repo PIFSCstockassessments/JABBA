@@ -172,7 +172,7 @@ jbplot_ppdist <- function(jabba, output.dir=getwd(),as.png = FALSE,mfrow=c(round
       legend('right',c("Prior","Posterior"),pch=22,cex=cex+0.1,pt.cex=cex+0.1,pt.bg = c(grey(0.4,1),grey(0.8,0.6)),bty="n")
       PPVR = round((sd(post.par)/mean(post.par))^2/(sd(rpr)/mean(rpr))^2,3)
       PPVM = round(mean(post.par)/mean(rpr),3)
-      legend("topright",c(paste("PPMR =",PPVM),paste("PPVR =",PPVR)),cex=cex,bty="n", x.intersp=0.5,y.intersp=0.85)
+      if(addPP) legend("topright",c(paste("PPMR =",PPVM),paste("PPVR =",PPVR)),cex=cex,bty="n", x.intersp=0.5,y.intersp=0.85)
 
     }
     if(i==2){
