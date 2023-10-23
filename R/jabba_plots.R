@@ -142,7 +142,8 @@ jbplot_catcherror <- function(jabba,output.dir=getwd(),as.png = FALSE,add=FALSE,
 
 jbplot_ppdist <- function(jabba, output.dir=getwd(),as.png = FALSE,mfrow=c(round((ncol(jabba$pars_posterior))/3+0.33,0),3),width  = 8, height = 2.5*round(ncol(jabba$pars_posterior)/3,0),cex=0.8,verbose=TRUE,addPP=TRUE){
   if(verbose) cat(paste0("\n","><> jbplot_ppist() - prior and posterior distributions  <><","\n"))
-  out =   jabba$pars_posterior
+  out =   cbind(jabba$pars_posterior, jabba$posteriors$tau2)
+  colnames(out)[ncol(out)] = "tau2"
   node_id = names(out)
   #informative priors
   Prs = as.matrix(cbind(jabba$settings$K.pr,jabba$settings$r.pr,c(0,0),jabba$settings$psi.pr))
