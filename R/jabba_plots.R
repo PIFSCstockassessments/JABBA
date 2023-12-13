@@ -213,7 +213,7 @@ jbplot_ppdist <- function(jabba, output.dir=getwd(),as.png = FALSE,mfrow=c(round
       if(jabba$settings$psi.dist=="beta"){ #JS edited to miltiply by 1.2 as done in process equation line 219 of JABBA2JAGS
         rpr = rbeta(10000,(Prs[1,4]),Prs[2,4])*1.2
         pdf = stats::density(post.par*1.2,adjust=2)
-        prior = dbeta(sort(rpr),jabba$settings$psi.pr[1],jabba$settings$psi.pr[2])
+        prior = dbeta(sort(rpr),jabba$settings$psi.pr[1],jabba$settings$psi.pr[2])*1.2
         PPVR = round((sd(post.par*1.2)/mean(post.par*1.2))^2/(sd(rpr)/mean(rpr))^2,3)
         PPVM = round(mean(post.par*1.2)/mean(rpr),3)
         if(addPP) legend("topright",c(paste("PPMR =",PPVM),paste("PPVR =",PPVR)),cex=cex,bty="n", x.intersp=0.5,y.intersp=0.85)
