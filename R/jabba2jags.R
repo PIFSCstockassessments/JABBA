@@ -72,8 +72,8 @@ cat("
   if(jbinput$settings$psi.dist =="beta"){
     cat("
       # Beta Prior for Biomass depletion at the start (deteministic)
-      psi ~ dbeta(psi.pr[1],psi.pr[2])
-      psi<-psi*1.2
+      psi_raw ~ dbeta(psi.pr[1],psi.pr[2])
+      psi<-psi_raw*1.2
       ",append=TRUE)
   } else {
     cat("
