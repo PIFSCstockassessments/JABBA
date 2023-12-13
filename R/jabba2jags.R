@@ -216,7 +216,7 @@ cat("
   cat("
 
     #Process equation
-    Pmean[1] <- log(psi)*1.2  #JS added 1.2 multiplier 12/12/23
+    Pmean[1] <- log(psi*1.2)  #JS added 1.2 multiplier 12/12/23
     iPV[1] <- ifelse(1<(stI),10000,isigma2) # inverse process variance
     P[1] ~ dlnorm(Pmean[1],iPV[1]) # set to small noise instead of isigma2
     penB[1]  <- ifelse(P[1]<P_bound[1],log(K*P[1])-log(K*P_bound[1]),ifelse(P[1]>P_bound[2],log(K*P[1])-log(K*P_bound[2]),0)) # penalty if Pmean is outside viable biomass
