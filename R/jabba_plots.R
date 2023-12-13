@@ -211,7 +211,8 @@ jbplot_ppdist <- function(jabba, output.dir=getwd(),as.png = FALSE,mfrow=c(round
 
     if(i==4){
       if(jabba$settings$psi.dist=="beta"){
-        rpr = rbeta(10000,(Prs[1,4]),Prs[2,4])
+       # rpr = rbeta(10000,(Prs[1,4]),Prs[2,4])
+        rpr = runif(10000,0.01,1.2)
         pdf = stats::density(post.par,adjust=2)
         prior = dbeta(sort(rpr),jabba$settings$psi.pr[1],jabba$settings$psi.pr[2])
         PPVR = round((sd(post.par)/mean(post.par))^2/(sd(rpr)/mean(rpr))^2,3)
